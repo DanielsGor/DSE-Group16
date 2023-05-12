@@ -49,6 +49,7 @@ D_LDmax = cdLDmax * 0.5 * rho * V**2 * S
 
 ### Cruise configuration ###
 cL_cruise = np.sqrt(3*cd0*pi*AR*e)
+V_cruise = np.sqrt(W_tot/S*1/rho*1/cL_cruise)
 L_cruise = cL_cruise*0.5*rho*V**2*S
 angle_cruise = (cL_cruise-cl0)/cl_alpha
 cd_cruise = cd0 + cL_cruise**2/(pi*AR*e)
@@ -76,3 +77,5 @@ e = (Cl_10**2)/(Cd_10 - Cd0)/(pi * A)
 print(e)"""
 
 
+V_stall = np.sqrt(W_tot/S *2/rho * 1/1.6)
+print (hi)

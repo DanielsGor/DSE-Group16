@@ -90,6 +90,7 @@ while dW > 0.01:
     W_temp = ((0.43 + 0.09 +0.1)*5.55 + 1 + m_bat + m_prop ) * g
     dW = W_tot - W_temp
     W_tot = W_temp
-    
-print ('Weight:',W_temp, '\nmass:', W_temp/g,'\n Propulsion mass:', m_bat, '\n Battery mass:', m_bat)
+    m_tot = W_tot/g
+
+print ('Weight:',W_temp, '\nmass:', W_temp/g,'\nPropulsion mass:', m_prop, '\nBattery mass:', m_bat)
 #print(W_tot)

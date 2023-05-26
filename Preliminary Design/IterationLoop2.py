@@ -59,8 +59,8 @@ while np.abs(m-m_TOT) > m_TOT * convergence:
     P_req_climb = W_TOT * ROC / Eff_Prop + P_req_cruise
 
     #include power and energy margin
-    # E_req_cruise *= energyMargin
-    # P_req_climb *= powerMargin
+    E_req_cruise *= energyMargin
+    P_req_climb *= powerMargin
     
     #mass calculations
     m_PRP = m1 + (P_req_climb-p1) * dmdp

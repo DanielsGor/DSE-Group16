@@ -73,6 +73,7 @@ while np.abs(m-m_TOT) > m_TOT * convergence:
 
     # n_iter += 1
 
+
 print (m)
 print (cl_cruise/cd_cruise)
 """ 

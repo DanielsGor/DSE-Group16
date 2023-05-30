@@ -7,10 +7,10 @@ from math import pi
 g = 9.80665
 
 # Initial values
-V = 15             #m/s
+V = 15 #m/s
 rho = 1.225         #kg/m^3
 mu = 1.789*10**-5   #Pa x s
-m_tot = 6.555       #kg
+m_tot = 6.459211578395105       #kg
 m_pay = 1           #kg
 m_OE = m_tot - m_pay
 
@@ -56,12 +56,17 @@ cd_cruise = cd0 + cL_cruise**2/(pi*AR*e)
 T_cruise = cd_cruise*0.5*rho*V**2 * S
 
 ### TAKE OFF calculations (for thrust) ###
-climb_angle = np.arcsin(ROC_requirement/V)
-cL_TO = W_tot * np.cos(climb_angle) / (0.5*rho*V**2 * S)
+cL_TO = np.sqrt (3*cd0*np.pi*AR*e)
 angle_TO = (cL_TO - cl0)/cl_alpha
 cd_TO = cd0 + cL_TO**2 /(pi*AR*e)
 
-T_TO  = W_tot*np.sin(climb_angle) + cd_TO*0.5*rho*V**2*S
+
+polynomial = np.poly1d([cL_TO**2 * 0.25 * rho**2 * S**2,0,0,0,-W_tot**2,0,ROC_requirement**2*W_tot**2])
+V_TO = np.real(polynomial.r[0])
+climb_angle = np.arcsin(ROC_requirement/V_TO)
+
+
+T_TO  = W_tot*np.sin(climb_angle) + cd_TO*0.5*rho*V_TO**2*S
 
 #Ignore this it resulted in a value >1 which doesnt make sense
 """#Now using XFLR5 method from the paper because our e was way too high (0.907382)

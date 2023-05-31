@@ -25,13 +25,13 @@ def calculate_C_L_h_alpha(A_h, lamda_h, C_l_alpha_h):
 #constants & inputs
 
 #wing constants
-S = # [m^2] wing surface area
-b = # [m] wing span
+S = 1.1# [m^2] wing surface area
+b = 2.95# [m] wing span
 b_fus = # [m] fuselage width
 C_l_alpha = # [-] lift curve slope wing
-A = # [-] aspect ratio wing
-lamda = # [-] taper ratio wing
-c_root = # [m] root chord wing
+A = 7.91136# [-] aspect ratio wing
+lamda = 0.45 # [-] taper ratio wing
+c_root = 0.49078# [m] root chord wing
 mac = 0.37288 # [m] mean aerodynamic chord wing
 VhV2 = 1 # [-] ratio of horizontal tail velocity to aircraft velocity
 

@@ -43,12 +43,15 @@ energy_density = 170 # Wh/kg
 
 ### TAKE OFF calculations (for thrust) ###
 def TO_thrust(W):
-    climb_angle = np.arcsin(ROC_requirement/V)
-    cL_TO = W* np.cos(climb_angle) / (0.5*rho*V**2 * S)
-    #angle_TO = (cL_TO - cl0)/cl_alpha
-    cd_TO = cd0 + cL_TO**2 /(np.pi*AR*e)
-    T_TO  = W*np.sin(climb_angle) + cd_TO*0.5*rho*V**2*S
-    return T_TO
+    cl_c = np.sqrt (3*cd0*np.pi*AR*e)
+    cd_c = cd0 + cl_c**2 /(np.pi*AR*e)
+
+    polynomial = np.poly1d([cl_c**2 * 0.25 * rho**2 * S**2,0,0,0,-W_tot**2,0,ROC_requirement**2*W_tot**2])
+    V_c = np.real(polynomial.r[0])
+    gamma_c = np.arcsin(ROC_requirement/V_c)
+
+    T_c = cd_c * 0.5 * rho * V_c**2 * S + W_tot*np.sin(gamma_c)
+    return T_c
 
 def C_thrust (W):
     cL_cruise = np.sqrt(3*cd0*np.pi*AR*e)
@@ -90,6 +93,7 @@ while dW > 0.01:
     W_temp = ((0.43 + 0.09 +0.1)*5.55 + 1 + m_bat + m_prop ) * g
     dW = W_tot - W_temp
     W_tot = W_temp
-    
-print ('Weight:',W_temp, '\nmass:', W_temp/g,'\n Propulsion mass:', m_bat, '\n Battery mass:', m_bat)
+    m_tot = W_tot/g
+
+print ('Weight:',W_temp, '\nmass:', W_temp/g,'\nPropulsion mass:', m_prop, '\nBattery mass:', m_bat)
 #print(W_tot)

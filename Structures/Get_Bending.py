@@ -1,25 +1,41 @@
 import numpy as np
 
+#   Dummy inputs for different span-wise elements
+Mx = np.arange(10, 7, -1)
+My = np.arange(10, 7, -1)
+Ixx = np.arange(10, 8.5, -0.5)
+Iyy = np.arange(10, 8.5, -0.5)
+Ixy = np.zeros(3)
 
-#   Dummy inputs
-Mx = np.arange(10, 0, -1) # Dummy bending distribution
+#   Dummy wing coordinates in nested arrays. Outer list refers to different span-wise elements,
+#   whereas inner list corresponds to different points
 
-My = np.arange(10, 0, -1)
+xwing = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+ywing = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
 
-Ixx = np.arange(10, 5, -0.5)
+def BendingStress(Mx, My, Ixx, Iyy, Ixy, xwing, ywing):
+    #   Neutral axis angle from cg coordinate frame
+    tana = np.tan(-(My * Ixx - Mx * Ixy) / (Mx * Iyy - My * Ixy))
 
-Iyy = np.arange(10, 5, -0.5)
+    #   Initialize arrays
+    max_stress = np.zeros(len(My))
+    max_stress_loc = np.zeros((2, len(My)))
 
-Ixy = np.zeros(10)
+    for i in range(len(My)):
+        #   Find maximum distance from NA for each span increment
+        na_dist = np.abs(tana[i] * xwing[i] - ywing[i]) / np.sqrt(tana[i] ** 2 + 1)
+        max_dist_i = np.argmax(na_dist)
 
-#   Dummy coordinates for the maximum normal stress point
+        #   Stress calculation
+        max_stress[i] = ((Mx[i] * Iyy[i] - My[i] * Ixy[i]) * ywing[i][max_dist_i] + (My[i] * Ixx[i] - Mx[i] * Ixy[i]) *
+                         xwing[i][max_dist_i]) / (Ixx[i] * Iyy[i] - Ixy[i] ** 2)
 
-xstress = 1.
+        #   Assign maximum stress location values
+        max_stress_loc[0][i] = np.array(xwing[i][max_dist_i])
+        max_stress_loc[1][i] = np.array(ywing[i][max_dist_i])
 
-ystress = 2.
+    return(max_stress, max_stress_loc)
 
-#   Stress calculation
+max_stress, max_stress_loc = BendingStress(Mx, My, Ixx, Iyy, Ixy, xwing, ywing)
 
-Sz = ((Mx * Iyy - My * Ixy) * ystress + (My * Ixx - Mx * Ixy) * xstress) / (Ixx * Iyy - Ixy ** 2)
-
-print(Sz)
+print(max_stress, max_stress_loc)

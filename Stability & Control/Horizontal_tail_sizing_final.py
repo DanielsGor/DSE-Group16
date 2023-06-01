@@ -168,9 +168,9 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
     # Create the plot
     fig, ax = plt.subplots()
 
-    ax.plot(x_bar_cg_range, htail_volume_stability, label='Stability line')
-    ax.plot(x_bar_cg_range, htail_volume_stability_SM, label='Stability line with SM')
-    ax.plot(x_bar_cg_range, htail_volume_control, label='Control line')
+    ax.plot(x_bar_cg_range, htail_volume_stability, label='Stability line', color='orange')
+    ax.plot(x_bar_cg_range, htail_volume_stability_SM, label='Stability line with SM', color='black')
+    ax.plot(x_bar_cg_range, htail_volume_control, label='Control line', color='black')
 
     initial_height = 0.5
     y_line = [initial_height, initial_height]
@@ -178,7 +178,7 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
     x_control = inverted_htail_volume_control(initial_height, C_L_h, C_L_Ah, x_bar_ac)
     x_line = [x_control, x_control + delta_x_cg_bar]
 
-    line, = ax.plot(x_line, y_line, color='r')
+    line, = ax.plot(x_line, y_line, color='green')
 
     slider_pos = [0.92, 0.1, 0.03, 0.8]  # [left, bottom, width, height]
 
@@ -202,7 +202,7 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
     plt.show()
 
 
-def main():
+def main_htail():
 
     '''
     Main function
@@ -217,8 +217,12 @@ def main():
 
     htail_volume_stability, htail_volume_stability_SM, htail_volume_control = calculate_stability_control(x_bar_ac, C_L_h_alpha, C_L_Ah_alpha, deda, VhV2, SM, C_L_h, C_L_Ah)
     scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_SM, htail_volume_control, delta_x_cg_bar, C_L_h, C_L_Ah, x_bar_ac)
-
-    print('Final horizontal tail volume: ', horizontal_tail_volume)
+    if 'horizontal_tail_volume' in globals():
+        print('Final horizontal tail volume: ', horizontal_tail_volume)
+        return horizontal_tail_volume
+    else:
+        print('No horizontal tail volume saved')
+        return None
 
 if __name__ == '__main__':
-    main()
+    main_htail()

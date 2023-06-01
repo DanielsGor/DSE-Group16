@@ -71,16 +71,26 @@ C_m_ac = -0.16 # [-]
 deda = 0.0 #depends on the tail configuration # formula E-52 in Torenbeek, r and m in fig E-13
 
 # Stability line ----------------------------------------------------------------
-SM = 0.05 #stability margin
-htail_volume_stability = (x_bar_cg_range - x_bar_ac + SM) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
+SM = 0.1 #stability margin
+htail_volume_stability = (x_bar_cg_range - x_bar_ac) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
+htail_volume_stability_SM = (x_bar_cg_range - x_bar_ac + SM) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
 
 # Control line ------------------------------------------------------------------
 htail_volume_control = 1 / (C_L_h / C_L_Ah * VhV2) * x_bar_cg_range + (C_m_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
 
+p = htail_volume_control - htail_volume_stability_SM
+m = np.min(p[p>delta_x_cg_bar])
+print(m, p)
+idx = int(np.where(p == m)[0][0])
+#print('The minimum distance between the stability and control line is: ', m, ' at x_bar_cg = ', x_bar_cg_range[idx])
+print(idx)
 
 #plotting ----------------------------------------------------------------------
 plt.plot(x_bar_cg_range, htail_volume_stability, label = 'Stability line')
+plt.plot(x_bar_cg_range, htail_volume_stability_SM, label = 'Stability line with SM')
 plt.plot(x_bar_cg_range, htail_volume_control, label = 'Control line')
+plt.hlines(y=htail_volume_control[idx], xmin= x_bar_cg_range[idx], xmax = x_bar_cg_range[idx] + delta_x_cg_bar, label = 'x_cg range')
+plt.title('Horizontal tail sizing - Scissor plot')
 plt.xlabel('x_cg_bar')
 plt.ylabel('Volume_h')
 plt.grid()

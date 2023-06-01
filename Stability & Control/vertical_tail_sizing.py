@@ -22,3 +22,14 @@ def calculate_vtail_volume(Cn_beta):
     plt.vlines(Cn_beta, colors='r', linestyles='dashed')
     plt.show()
     return tail_volume
+
+def main():
+
+    '''
+    Main function
+    '''
+
+    print(V_cruise)
+
+if __name__ == '__main__':
+    main()

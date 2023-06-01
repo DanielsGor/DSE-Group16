@@ -10,7 +10,18 @@ interactive scissor plot in which the cg range can be varied and optimized visua
 tail volume which can be obtained by using the button in the plot.
 """
 
-#%% Get inputs from Excel file
+#%% Define Input Parameters
+r = 50                          # turn radius [m]
+ROC = 5                         # rate of climb [m/s]
+delta_h = 80                    # change in altitude for climb [m]
+A_h= 5                          # aspect ratio horizontal tail [-]
+lamba_h = 0.8                   # taper ratio horizontal tail [-]
+C_l_alpha_h = 0.1 * 180/np.pi   # lift curve slope horizontal tail [-]
+SM = 0.10                       # stability margin [-]
+
+#%% Assume several parameters
+VhV2 = 1                        # (V_h/V)^2 [-]
+deda = 0                        # downwash gradient [-]
 
 
 
@@ -189,6 +200,8 @@ def main():
     '''
     Main function
     '''
+
+    print(V_cruise)
 
 if __name__ == '__main__':
     main()

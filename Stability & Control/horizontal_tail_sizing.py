@@ -74,9 +74,6 @@ deda = 0.0 #depends on the tail configuration # formula E-52 in Torenbeek, r and
 # Stability line ----------------------------------------------------------------
 SM = 0.1 #stability margin
 
-a = 1 /  (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
-b = - x_bar_ac * a
-
 htail_volume_stability = (x_bar_cg_range - x_bar_ac) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
 htail_volume_stability_SM = (x_bar_cg_range - x_bar_ac + SM) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
 

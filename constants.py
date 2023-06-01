@@ -22,5 +22,5 @@ df = pd.read_excel(file_paths[0])
 for index, value in df[['Symbol in code', 'Value']].values:
     locals()[index] = value
 
-
+print('test')
 

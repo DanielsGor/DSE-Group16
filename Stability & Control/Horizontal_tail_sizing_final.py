@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import *
+from constants import g, rho, T, V_cruise, m_tot, ROC, Cm_ac, b, S, A, MAC, lamba, c_r, c_t, C_l_alpha, b_fus, x_bar_ac
 from matplotlib.widgets import Slider, Button
 
 """
@@ -18,6 +18,9 @@ A_h= 5                          # aspect ratio horizontal tail [-]
 lamba_h = 0.8                   # taper ratio horizontal tail [-]
 C_l_alpha_h = 0.1 * 180/np.pi   # lift curve slope horizontal tail [-]
 SM = 0.10                       # stability margin [-]
+x_cg_min_bar = 0.15             # minimum cg position [-]
+x_cg_max_bar = 0.35             # maximum cg position [-]
+delta_x_cg_bar = x_cg_max_bar - x_cg_min_bar # [-] cg range, normalised by mac
 
 #%% Assume several parameters
 VhV2 = 1                        # (V_h/V)^2 [-]
@@ -26,6 +29,10 @@ deda = 0                        # downwash gradient [-]
 
 
 #%% Functions used in the program
+
+x_bar_min = -0.5
+x_bar_max = 1
+x_bar_cg_range = np.linspace(-0.5, 1, 1000)
 
 def calculate_C_L_w_alpha(A, lamda, C_l_alpha):
     '''
@@ -100,14 +107,12 @@ def calculate_C_L_Ah(W, v_climb, S):
     return C_L_Ah
 
 
-def calculate_stability_control(x_bar_ac, C_L_h_alpha, C_L_Ah_alpha, deda, VhV2, SM):
+def calculate_stability_control(x_bar_ac, C_L_h_alpha, C_L_Ah_alpha, deda, VhV2, SM, C_L_h, C_L_Ah):
 
     '''
     Calculates the stability and control lines for the scissor plot. Stability is calculated with and without the
     stability margin.
     '''
-
-    x_bar_cg_range = np.linspace(-0.5, 1, 1000)
 
     # Stability
     htail_volume_stability = (x_bar_cg_range - x_bar_ac) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
@@ -115,28 +120,28 @@ def calculate_stability_control(x_bar_ac, C_L_h_alpha, C_L_Ah_alpha, deda, VhV2,
 
     # Control
     slope = 1 / (C_L_h / C_L_Ah * VhV2)
-    intercept = (C_m_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
+    intercept = (Cm_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
 
     htail_volume_control = slope * x_bar_cg_range + intercept
 
     return htail_volume_stability, htail_volume_stability_SM, htail_volume_control
 
 
-def inverted_htail_volume_control(htail_volume_control):
+def inverted_htail_volume_control(htail_volume_control, C_L_h, C_L_Ah, x_bar_ac):
 
     '''
     Calculates the x_bar_cg location of a given horizontal tail volume
     '''
 
     slope = 1 / (C_L_h / C_L_Ah * VhV2)
-    intercept = (C_m_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
+    intercept = (Cm_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
 
     x_bar_cg = (htail_volume_control - intercept) / slope
 
     return x_bar_cg
 
 
-def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_SM, htail_volume_control, delta_x_cg_bar):
+def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_SM, htail_volume_control, delta_x_cg_bar, C_L_h, C_L_Ah, x_bar_ac):
 
     def update_line(value):
 
@@ -144,7 +149,7 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
         Update the location of the cg range line
         '''
 
-        x_control = inverted_htail_volume_control(value)
+        x_control = inverted_htail_volume_control(value, C_L_h, C_L_Ah, x_bar_ac)
         line.set_data([x_control, x_control + delta_x_cg_bar], [value, value])
 
         fig.canvas.draw_idle()
@@ -155,9 +160,9 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
         '''
         Button to save the current value of the slider
         '''
-
-        saved_value = slider.val
-        print(f"Saved Value: {saved_value}")
+        global horizontal_tail_volume
+        horizontal_tail_volume = slider.val
+        print(f"Saved Value: {horizontal_tail_volume}")
 
 
     # Create the plot
@@ -170,28 +175,30 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
     initial_height = 0.5
     y_line = [initial_height, initial_height]
 
-    x_control = inverted_htail_volume_control(initial_height)
+    x_control = inverted_htail_volume_control(initial_height, C_L_h, C_L_Ah, x_bar_ac)
     x_line = [x_control, x_control + delta_x_cg_bar]
 
     line, = ax.plot(x_line, y_line, color='r')
 
+    slider_pos = [0.92, 0.1, 0.03, 0.8]  # [left, bottom, width, height]
+
     # Slider
-    slider_ax = fig.add_axes([0.15, 0.05, 0.7, 0.03])
-    slider = Slider(slider_ax, 'Height', 0, 1, valinit=initial_height)
+    slider_ax = fig.add_axes(slider_pos, facecolor='lightgray')
+    slider = Slider(slider_ax, 'Height', -1, 1.5, valinit=initial_height, orientation='vertical')
 
     # Button
-    button_ax = fig.add_axes([0.85, 0.05, 0.1, 0.03])
+    button_ax = fig.add_axes([0.85, 0.02, 0.1, 0.03])
     button = Button(button_ax, 'Save')
 
     # Initiate button and slider
     button.on_clicked(button_callback)
     slider.on_changed(update_line)
 
-    plt.title('Horizontal tail sizing - Scissor plot')
-    plt.xlabel('CG location / MAC')
-    plt.ylabel('Horizontal tail volume')
-    plt.grid()
-    plt.legend()
+    ax.set_title('Horizontal tail sizing - Scissor plot', loc='center')
+    ax.set_xlabel('CG location / MAC', labelpad=10)
+    ax.set_ylabel('Horizontal tail volume', labelpad=10)
+    ax.grid()
+
     plt.show()
 
 
@@ -201,7 +208,17 @@ def main():
     Main function
     '''
 
-    print(V_cruise)
+    v_climb = calculate_v_climb(r, ROC, delta_h)
+    C_L_h_alpha = calculate_C_L_h_alpha(A_h, lamba_h, C_l_alpha_h)
+    C_L_w_alpha = calculate_C_L_w_alpha(A, lamba, C_l_alpha)
+    C_L_Ah_alpha = calculate_C_L_Ah_alpha(C_L_w_alpha, lamba, b, b_fus, c_r, S)
+    C_L_h = calculate_C_L_h(A_h)
+    C_L_Ah = calculate_C_L_Ah(m_tot*g, v_climb, S)
+
+    htail_volume_stability, htail_volume_stability_SM, htail_volume_control = calculate_stability_control(x_bar_ac, C_L_h_alpha, C_L_Ah_alpha, deda, VhV2, SM, C_L_h, C_L_Ah)
+    scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_SM, htail_volume_control, delta_x_cg_bar, C_L_h, C_L_Ah, x_bar_ac)
+
+    print('Final horizontal tail volume: ', horizontal_tail_volume)
 
 if __name__ == '__main__':
     main()

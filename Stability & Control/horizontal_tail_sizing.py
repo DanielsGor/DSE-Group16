@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
 
 #functions --------------------------------------------------------------------
 #calculate C_L_w_alpha
@@ -72,11 +73,22 @@ deda = 0.0 #depends on the tail configuration # formula E-52 in Torenbeek, r and
 
 # Stability line ----------------------------------------------------------------
 SM = 0.1 #stability margin
+
+a = 1 /  (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
+b = - x_bar_ac * a
+
 htail_volume_stability = (x_bar_cg_range - x_bar_ac) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
 htail_volume_stability_SM = (x_bar_cg_range - x_bar_ac + SM) / (C_L_h_alpha / C_L_Ah_alpha * (1 - deda) * VhV2)
 
 # Control line ------------------------------------------------------------------
-htail_volume_control = 1 / (C_L_h / C_L_Ah * VhV2) * x_bar_cg_range + (C_m_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
+a =1 / (C_L_h / C_L_Ah * VhV2)
+b = (C_m_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
+
+htail_volume_control = a * x_bar_cg_range + b
+
+def inverted_htail_volume_control(htail_volume_control):
+    return (htail_volume_control - b) / a
+#htail_volume_control = 1 / (C_L_h / C_L_Ah * VhV2) * x_bar_cg_range + (C_m_ac / C_L_Ah - x_bar_ac) / (C_L_h / C_L_Ah * VhV2)
 
 p = htail_volume_control - htail_volume_stability_SM
 m = np.min(p[p>delta_x_cg_bar])
@@ -85,6 +97,47 @@ idx = int(np.where(p == m)[0][0])
 #print('The minimum distance between the stability and control line is: ', m, ' at x_bar_cg = ', x_bar_cg_range[idx])
 print(idx)
 
+# Create the figure and axes
+fig, ax = plt.subplots()
+
+# Plot the X plot
+ax.plot(x_bar_cg_range, htail_volume_stability, label='Stability line')
+ax.plot(x_bar_cg_range, htail_volume_stability_SM, label='Stability line with SM')
+ax.plot(x_bar_cg_range, htail_volume_control, label='Control line')
+
+# Set the initial height of the horizontal line
+initial_height = 0.5
+
+# Get the x-coordinate of the control line
+x_control = inverted_htail_volume_control(initial_height)
+
+# Plot the horizontal line
+line = ax.axhline(initial_height, x_control, x_control + delta_x_cg_bar, color='r')
+
+
+
+# Create a slider axes
+slider_ax = fig.add_axes([0.15, 0.05, 0.7, 0.03])
+
+# Create the slider
+slider = Slider(slider_ax, 'Height', 0, 1, valinit=initial_height)
+
+# Define a function to update the horizontal line position
+def update_line(value):
+    line.set_ydata(value)
+    fig.canvas.draw_idle()
+
+# Register the update function with the slider
+slider.on_changed(update_line)
+
+plt.title('Horizontal tail sizing - Scissor plot')
+plt.xlabel('x_cg_bar')
+plt.ylabel('Volume_h')
+plt.grid()
+plt.show()
+
+
+'''
 #plotting ----------------------------------------------------------------------
 plt.plot(x_bar_cg_range, htail_volume_stability, label = 'Stability line')
 plt.plot(x_bar_cg_range, htail_volume_stability_SM, label = 'Stability line with SM')
@@ -96,3 +149,4 @@ plt.ylabel('Volume_h')
 plt.grid()
 plt.legend()
 plt.show()
+'''

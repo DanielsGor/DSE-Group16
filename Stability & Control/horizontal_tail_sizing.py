@@ -125,6 +125,13 @@ slider = Slider(slider_ax, 'Height', 0, 1, valinit=initial_height)
 # Define a function to update the horizontal line position
 def update_line(value):
     line.set_ydata(value)
+
+    # Calculate the x-coordinate of the control line based on the new y-coordinate value
+    x_control = inverted_htail_volume_control(value)
+
+    # Update the x-coordinate of the left point of the horizontal line
+    line.set_xdata([x_control, x_control + delta_x_cg_bar])
+
     fig.canvas.draw_idle()
 
 # Register the update function with the slider

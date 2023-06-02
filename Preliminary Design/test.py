@@ -1,16 +1,8 @@
 import numpy as np
 import pandas as pd
-file = "Preliminary Design\Preliminary design.xlsx"
-sheet_name1 = "Sheet2"
+dict = {'a':0,'b':2}
+for i in dict:
+    print(i)
 
-a = np.array([[1, 2], [3, 4]])
-
-b = np.array([[5, 6]])
-
-print(np.concatenate((a, b), axis=0))
-
-result = np.concatenate((a, b.T), axis=1)
-
-df = pd.DataFrame(result, columns = False)
-print (df)
-
+for i in (chr(x) for x in range(ord('A'), ord('Z')+1)):
+    print(i)

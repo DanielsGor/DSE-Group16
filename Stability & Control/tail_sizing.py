@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from vertical_tail_sizing import main_vtail
-from Horizontal_tail_sizing_final import main_htail
+from horizontal_tail_sizing_final import main_htail
 from constants import S, b, MAC
 
 vtail_volume = main_vtail()
@@ -43,7 +43,7 @@ slider_intercept_ax = plt.axes([0.15, 0.05, 0.65, 0.03])
 
 # Sliders
 slider_slope = Slider(slider_slope_ax, 'slope', 0, 2, valinit=slope)
-slider_intercept = Slider(slider_intercept_ax, 'intercept', 0, 1, valinit=intercept)
+slider_intercept = Slider(slider_intercept_ax, 'intercept', -1, 1, valinit=intercept)
 
 
 def update_plot(val):
@@ -60,6 +60,7 @@ def update_plot(val):
     line_h.set_ydata(S_h)
     line_v.set_xdata(l_h)  # Maybe change this to l_v SHOULD BE REVISED
     line_v.set_ydata(S_v)
+
 
     # Redraw the plot
     ax1.relim()

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import g, rho, T, V_cruise, m_tot, ROC, Cm_ac, b, S, A, MAC, lamba, c_r, c_t, C_l_alpha, b_fus, x_bar_ac
+from constants import g, rho, T, V_cruise, m_tot, ROC, Cm_ac, b, S, A, MAC, lamda, c_r, c_t, C_l_alpha, b_fus, x_bar_ac
 from matplotlib.widgets import Slider, Button
 
 """
@@ -15,7 +15,7 @@ r = 50                          # turn radius [m]
 ROC = 5                         # rate of climb [m/s]
 delta_h = 80                    # change in altitude for climb [m]
 A_h= 5                          # aspect ratio horizontal tail [-]
-lamba_h = 0.8                   # taper ratio horizontal tail [-]
+lamda_h = 0.8                   # taper ratio horizontal tail [-]
 C_l_alpha_h = 0.1 * 180/np.pi   # lift curve slope horizontal tail [-]
 SM = 0.10                       # stability margin [-]
 x_cg_min_bar = 0.15             # minimum cg position [-]
@@ -30,8 +30,6 @@ deda = 0                        # downwash gradient [-]
 
 #%% Functions used in the program
 
-x_bar_min = -0.5
-x_bar_max = 1
 x_bar_cg_range = np.linspace(-0.5, 1, 1000)
 
 def calculate_C_L_w_alpha(A, lamda, C_l_alpha):
@@ -209,9 +207,9 @@ def main_htail():
     '''
 
     v_climb = calculate_v_climb(r, ROC, delta_h)
-    C_L_h_alpha = calculate_C_L_h_alpha(A_h, lamba_h, C_l_alpha_h)
-    C_L_w_alpha = calculate_C_L_w_alpha(A, lamba, C_l_alpha)
-    C_L_Ah_alpha = calculate_C_L_Ah_alpha(C_L_w_alpha, lamba, b, b_fus, c_r, S)
+    C_L_h_alpha = calculate_C_L_h_alpha(A_h, lamda_h, C_l_alpha_h)
+    C_L_w_alpha = calculate_C_L_w_alpha(A, lamda, C_l_alpha)
+    C_L_Ah_alpha = calculate_C_L_Ah_alpha(C_L_w_alpha, lamda, b, b_fus, c_r, S)
     C_L_h = calculate_C_L_h(A_h)
     C_L_Ah = calculate_C_L_Ah(m_tot*g, v_climb, S)
 

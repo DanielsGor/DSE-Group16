@@ -18,8 +18,7 @@ df = df.set_index('span')
 # Change column names to load case names
 df.columns = ['L', 'D', 'CM', 'BM']
 
-print(df)
-print(np.trapz(df['L'], df.index))
+# print(np.trapz(df['L'], df.index))
 
 # Half the dataframe
 df = df[df.index > 0]

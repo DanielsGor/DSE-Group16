@@ -27,8 +27,9 @@ def fuselage_layout():
     stringer_width = 0.02  # Width of the stringers in meters
     stringer_height = 0.02  # Height of the stringers in meters
     stringer_thickness = 0.005  # Thickness of the stringers in meters
-    material_strength = 1000.0  # Material strength in megapascals (MPa)
-
+    #   For wood materials, assume that yield strength = ultimate strength, use graphs for support
+    balsa_tstrength = 7.501  # Tensile strength of balsasud ultralite in MPa
+    balsa_cstrength = 6.53  # Compressive strength of balsasud ultralite in MPa
 
     #   Internal loading diagrams should be made here
     #   Dummy values are used for now
@@ -37,17 +38,18 @@ def fuselage_layout():
 
     pitch_list = np.arange(0.01, 0.7, 0.01)
 
-    d = [[],[]]
+    normal_stress = 0
+    p = 0.15
 
-    for p in pitch_list:
+    while np.all(normal_stress) < balsa_tstrength and np.all(normal_stress) < balsa_cstrength:
         n = fuselage_width // p
         stringer_area = (stringer_width + stringer_height) * stringer_thickness - stringer_thickness ** 2
         Ixx = 2 * n * stringer_area * (fuselage_height / 2) ** 2
         normal_stress = internal_bending * fuselage_height / (Ixx * 2)
-        d[0].append(np.max(normal_stress))
-        d[1].append(p)
+        p = p + 0.01
 
-    return d
+
+    return normal_stress, p
 
 d = fuselage_layout()
 

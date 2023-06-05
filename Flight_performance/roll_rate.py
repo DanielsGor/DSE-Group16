@@ -8,7 +8,7 @@ V = 15.1 #m/s
 roll_rate = 5 #deg/s
 dt = 0.001 #s
 t = 0
-nTurnsTotal = 3
+nTurnsTotal = 2
 
 #TODO: Propulsion influence
 
@@ -23,7 +23,7 @@ global_yaw_angle = 0
 gs = [0] 
 phi = 0
 
-while global_yaw_angle < 3/nTurnsTotal *np.pi:
+while global_yaw_angle < 2*np.pi*(nTurnsTotal-1) - np.pi/2:
     t += dt
     phi += roll_rate* dt
     a_centripetal = np.tan(np.deg2rad(phi)) * m * g
@@ -43,6 +43,8 @@ while global_yaw_angle < 3/nTurnsTotal *np.pi:
     global_yaw_angle += d_circle_angle
     gs.append(global_yaw_angle)
 
+max_load = np.sqrt(np.arctan(max(phis))+1)
+print(max_load, max(phis))
 print (x[-1],y[-1])
-plt.plot (Rs,time)
+plt.plot (x,y)
 plt.show()

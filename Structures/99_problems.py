@@ -1,3 +1,4 @@
+from constants import df
 #   Loads are going to affect the configuration
 
 #   Belly landing loads
@@ -17,6 +18,27 @@
 #   Cross-sectional area A: stringers and skin
 
 import numpy as np
+
+class fuselage:
+    def __init__(self):
+        # create self attributes with the lines of code below
+        self.length = df['fus_l']  # Length of the fuselage in meters
+        self.width = df['fus_w']  # Width of the fuselage in meters
+        self.height = df['fus_h']  # Height of the fuselage in meters
+        self.skin_thickness = df['t_skin']  # Thickness of the fuselage skin in meters
+        self.stringer_pitch = df['str_pitch']  # Spacing between stringers in meters
+        self.stringer_width = df['str_w']  # Width of the stringers in meters
+        self.stringer_height = df['str_h']  # Height of the stringers in meters
+        self.stringer_thickness = df['str_t']  # Thickness of the stringers in meters
+        self.balsa_tens = df['balsa_tens']  # Tensile strength of balsasud ultralite in MPa
+        self.balsa_comp = df['balsa_comp']  # Compressive strength of balsasud ultralite in MPa
+        self.internal_shear = None
+        self.internal_bending = None
+        self.pitch_list = None
+        self.normal_stress = None
+        self.p = None
+    def test(self):
+        print(self.length)
 
 def fuselage_layout():
     fuselage_length = 0.7  # Length of the fuselage in meters
@@ -51,9 +73,9 @@ def fuselage_layout():
 
     return normal_stress, p
 
-d = fuselage_layout()
+# d = fuselage_layout()
 
-print(d)
+# print(d)
 #   The following function is ChatGPT's stupid invention (it obviously does not work, but gave me a nice idea
 def generate_fuselage_layout(loads):
     # Define the dimensions and materials of the fuselage

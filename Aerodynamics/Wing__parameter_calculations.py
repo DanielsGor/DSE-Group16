@@ -15,15 +15,20 @@ def read_xlsx_input_data (file = read_file):
         dict[columntitles] = dat[idx,3]
     return dict
 
-def write_to_file (file = write_file, variable, value):
-    xfile = openpyxl.load_workbook('test.xlsx')
-    sheet = xfile.get_sheet_by_name('Sheet1')
-    sheet['A1'] = 'hello world'
-    xfile.save('text2.xlsx')
+def write_to_file (output_dict, file = write_file):
+    xfile = openpyxl.load_workbook(file)
+    sheet = xfile.get_sheet_by_name(write_sheet)
+    for idx,parameter in enumerate(output_dict):
+        print (idx,parameter)
+        sheet['A'+str(idx+1)] = parameter
+        sheet['B'+str(idx+1)] = output_dict[parameter]
+    xfile.save(file)
     return
 
 i = read_xlsx_input_data()
 o = {}
+
+write_to_file(output_dict=o)
 
 if PRINT:
     pass

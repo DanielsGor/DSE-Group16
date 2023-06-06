@@ -122,7 +122,7 @@ def calculate_spline_length(x, y):
 
     return total_length, segments, cg_spine
 
-
+a , b, cg_spine = calculate_spline_length(x_airfoil, y_airfoil)
 
 # length, segments = calculate_spline_length(newx_airfoil, newy_airfoil)
 # print(length)
@@ -175,7 +175,7 @@ for i in range(len(x_splines)):
     spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i])) #use new function ONNO
     spline_cgx.append(np.average(x_splines[i])) #use new function ONNO
     spline_cgy.append(np.average(y_splines[i])) #use new function ONNO
-print(spline_lengths)
+
 
 total_area = 0
 total_areax = 0

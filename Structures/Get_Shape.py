@@ -106,16 +106,23 @@ def split_list_at_numbers(lst, split_nums):
 
 def calculate_spline_length(x, y):
     total_length = 0
+    segment_length = []
+    segment_cgx = []
+    segment_cgy = []
     for i in range(len(x) - 1):
         x1, y1 = x[i], y[i]
         x2, y2 = x[i + 1], y[i + 1]
+        segment_length.append(math.sqrt((x2 - x1)**2 + (y2 - y1)**2))
+        segment_cgx.append((x1+x2)/2)
+        segment_cgy.append((y1+y2)/2)
+        segments = np.array([segment_length, segment_cgx, segment_cgy])
+    total_length = np.sum(segment_length)
 
-        segment_length = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        total_length += segment_length
+    return total_length, segments
 
-    return total_length
-
-
+# length, segments = calculate_spline_length(newx_airfoil, newy_airfoil)
+# print(length)
+# print(segments)
 
 
 
@@ -162,9 +169,7 @@ for i in range(len(x_splines)):
     spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i]))
     spline_cgx.append(np.average(x_splines[i]))
     spline_cgy.append(np.average(y_splines[i]))
-print(spline_lengths)
-print(spline_cgx)
-print(spline_cgy)
+
 
 
 
@@ -190,4 +195,3 @@ plt.show()
 
 
     #return(geom, Ixx, Iyy, Ixy)
-

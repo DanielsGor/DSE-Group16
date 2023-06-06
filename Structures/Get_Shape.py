@@ -1,9 +1,12 @@
+#LIBRARY-------------------------------------------------------------------------------------------------------
+
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 #inpute: amount of spars, skin geometry, spar thickness
 #Output: type, dimensions, Ixx, Iyy, Ixy, J
 
-
+#FUNCTIONS-------------------------------------------------------------------------------------------------------
 # Open the text document
 x_airfoil = []
 y_airfoil = []
@@ -18,7 +21,7 @@ with open("AirfoilData/NACA0012.txt", "r") as file:
     x_airfoil = [value * .001 for value in x_airfoil]
     y_airfoil = [value * .001 for value in y_airfoil]
 
-    plt.plot(x_airfoil, y_airfoil, 'b')  # 'bo' specifies blue color and circle markers
+    plt.plot(x_airfoil, y_airfoil, 'bo')  # 'bo' specifies blue color and circle markers
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
     plt.title('Check general airfoil geometry')
@@ -30,7 +33,6 @@ with open("AirfoilData/NACA0012.txt", "r") as file:
 #giving wing crossection for given span_x and airfoil geometry-------------------------------
 def get_spanwisegeom(span_x, x_airfoil, y_airfoil, C_root, C_tip, span):
     factor = C_root - ((span_x / span) * (C_root - C_tip))
-    print(factor)
     newx_airfoil = [value * factor for value in x_airfoil]
     newy_airfoil = [value * factor for value in y_airfoil]
     return newx_airfoil, newy_airfoil, factor
@@ -69,10 +71,10 @@ def calculate_spline_length_and_centroid(x_coordinates, y_coordinates):
     weights[2:-1:2] = 2
 
     # Calculate the sum of the weighted x-coordinates
-    sum_of_weights_x = np.sum(weights * x_coordinates)
+    sum_of_weights_x = np.sum(weights * x_coordinates[:-1])  # Exclude the last element
 
     # Calculate the sum of the weighted y-coordinates
-    sum_of_weights_y = np.sum(weights * y_coordinates)
+    sum_of_weights_y = np.sum(weights * y_coordinates[:-1])  # Exclude the last element
 
     # Calculate the area under the curve
     area = (h / 3) * np.sum(weights)
@@ -83,9 +85,35 @@ def calculate_spline_length_and_centroid(x_coordinates, y_coordinates):
 
     # Calculate the length using Simpson's rule formula
     length = (h / 3) * np.sum(
-        weights * np.sqrt(np.power(np.diff(x_coordinates), 2) + np.power(np.diff(y_coordinates), 2)))
+        weights * np.sqrt(np.power(np.diff(x_coordinates, n=1), 2) + np.power(np.diff(y_coordinates, n=1), 2)))
 
     return length, x_centroid, y_centroid
+
+
+def split_list_at_numbers(lst, split_nums):
+    splitted_lists = []
+    sublist = []
+
+    for item in lst:
+        sublist.append(item)
+        if item in split_nums:
+            splitted_lists.append(sublist.copy())
+            sublist.clear()
+            sublist.append(item)
+    splitted_lists.append(sublist)
+
+    return splitted_lists
+
+def calculate_spline_length(x, y):
+    total_length = 0
+    for i in range(len(x) - 1):
+        x1, y1 = x[i], y[i]
+        x2, y2 = x[i + 1], y[i + 1]
+
+        segment_length = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        total_length += segment_length
+
+    return total_length
 
 
 
@@ -103,19 +131,18 @@ def calculate_spline_length_and_centroid(x_coordinates, y_coordinates):
 
 
 
-#inputs of the program-----------------------------
-sparlocation = [.3, .6] #should be within root cord length
-#sparnr = 3
+#INPUTS----------------------------------------------------------------------------------------------------------
+sparlocation = [.3, .6] #factor of the cord
 span_x = .1         #meters
 C_root = 6          #meters
 C_tip = 4           #meters
 span = 2            #meters
 spar_w = .2         #meters
-spar_t = .2
-#---------------------------------------------------
+spar_t = .2         #meters
+skin_t = .2         #meters
+#MAIN PROGRAM---------------------------------------------------------------------------------------------
 newx_airfoil, newy_airfoil, factor = get_spanwisegeom(span_x, x_airfoil, y_airfoil, C_root, C_tip, span)
 sparlocation = np.array(sparlocation)*factor*1000
-print(sparlocation)
 
 x_spars = []
 y_spars = []
@@ -125,9 +152,21 @@ for i in sparlocation:
         x_spars.append(newx_airfoil[i])
         y_spars.append(newy_airfoil[i])
 x_cg, y_cg = get_cg(x_spars, y_spars, spar_w, spar_t)
+x_splines = split_list_at_numbers(newx_airfoil, x_spars)
+y_splines = split_list_at_numbers(newy_airfoil, y_spars)
 
-print(x_spars)
-print(y_spars)
+spline_lengths = []
+spline_cgx = []
+spline_cgy = []
+for i in range(len(x_splines)):
+    spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i]))
+    spline_cgx.append(np.average(x_splines[i]))
+    spline_cgy.append(np.average(y_splines[i]))
+print(spline_lengths)
+print(spline_cgx)
+print(spline_cgy)
+
+
 
 for i in sparlocation:
     x_index = find_closest_number_indices(newx_airfoil, i)

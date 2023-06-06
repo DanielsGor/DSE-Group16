@@ -45,20 +45,20 @@ def find_closest_number_indices(lst, target):
 def get_cg(x_spars, y_spars, spar_w, spar_t):
     x_areaxdistance = 0
     y_areaxdistance = 0
-    area = 0
+    spararea = 0
     #define cg of all flanges together
     for i in range(len(x_spars)):
-        area += spar_w*spar_t
+        spararea += spar_w*spar_t
         x_areaxdistance += (spar_w*spar_t)*x_spars[i]
         y_areaxdistance += (spar_w*spar_t)*y_spars[i]
     rangi = np.arange(0, len(x_spars), 2)
     for i in rangi:
-        area += (y_spars[i]-y_spars[i+1])*spar_t
+        spararea += (y_spars[i]-y_spars[i+1])*spar_t
         x_areaxdistance += ((y_spars[i]-y_spars[i+1])*spar_t)*(.5*(x_spars[i]+x_spars[i+1]))
         y_areaxdistance += ((y_spars[i]-y_spars[i+1])*spar_t)*(.5*(y_spars[i]+y_spars[i+1]))
-    x_cg = x_areaxdistance/area
-    y_cg = y_areaxdistance/area
-    return(x_cg, y_cg)
+    x_cg = x_areaxdistance/spararea
+    y_cg = y_areaxdistance/spararea
+    return(x_cg, y_cg, spararea)
 
 
 def calculate_spline_length_and_centroid(x_coordinates, y_coordinates):
@@ -147,6 +147,8 @@ span = 2            #meters
 spar_w = .2         #meters
 spar_t = .2         #meters
 skin_t = .2         #meters
+
+
 #MAIN PROGRAM---------------------------------------------------------------------------------------------
 newx_airfoil, newy_airfoil, factor = get_spanwisegeom(span_x, x_airfoil, y_airfoil, C_root, C_tip, span)
 sparlocation = np.array(sparlocation)*factor*1000
@@ -158,7 +160,7 @@ for i in sparlocation:
     for i in x_index:
         x_spars.append(newx_airfoil[i])
         y_spars.append(newy_airfoil[i])
-x_cg, y_cg = get_cg(x_spars, y_spars, spar_w, spar_t)
+sparx_cg, spary_cg, spararea = get_cg(x_spars, y_spars, spar_w, spar_t)
 x_splines = split_list_at_numbers(newx_airfoil, x_spars)
 y_splines = split_list_at_numbers(newy_airfoil, y_spars)
 
@@ -166,9 +168,24 @@ spline_lengths = []
 spline_cgx = []
 spline_cgy = []
 for i in range(len(x_splines)):
-    spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i]))
-    spline_cgx.append(np.average(x_splines[i]))
-    spline_cgy.append(np.average(y_splines[i]))
+    spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i])) #use new function ONNO
+    spline_cgx.append(np.average(x_splines[i])) #use new function ONNO
+    spline_cgy.append(np.average(y_splines[i])) #use new function ONNO
+print(spline_lengths)
+
+total_area = 0
+total_areax = 0
+total_areay = 0
+for i in range(len(spline_lengths)):
+    total_area.append(spline_lengths[i])
+    total_area.append(spararea)
+    total_areax.append(spline_lengths[i]*spline_cgx[i])
+    total_areax.append(sparx_cg*spararea)
+    total_areay.append(spline_lengths[i]*spline_cgy[i])
+    total_areay.append(spary_cg * spararea)
+
+totalcg_x = total_areax/total_area
+totalcg_y = total_areay/total_area
 
 
 
@@ -177,7 +194,7 @@ for i in sparlocation:
     x_index = find_closest_number_indices(newx_airfoil, i)
     plt.vlines(x=i, ymin=newy_airfoil[x_index[1]], ymax=newy_airfoil[x_index[0]], colors='black', ls='solid', lw=2)
 plt.plot(newx_airfoil, newy_airfoil, 'r')  # 'ro' specifies red color and circle markers
-plt.scatter(x_cg, y_cg)
+plt.scatter(sparx_cg, spary_cg)
 plt.xlabel('X-axis')
 plt.ylabel('Y-axis')
 plt.title('Local airfoil geometry')
@@ -195,3 +212,4 @@ plt.show()
 
 
     #return(geom, Ixx, Iyy, Ixy)
+

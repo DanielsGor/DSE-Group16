@@ -124,6 +124,20 @@ def calculate_spline_length(x, y):
 
 a , b, cg_spine = calculate_spline_length(x_airfoil, y_airfoil)
 
+def IdealisedBoom(w_cap, t_cap, x_cgcap, y_cgcap, t_skin, cg_airfoil, Mx, My):
+    cg_cap = np.array([x_cgcap, y_cgcap])
+    for i in range(len(cg_cap[0])):
+        cg_cap[:,i] = cg_airfoil - cg_cap[:,i]
+    Ixx = np.sum(cg_cap[:,1] ** 2 * w_cap * t_skin)
+    Iyy = np.sum(cg_cap[:,0] ** 2 * w_cap * t_skin)
+    Ixy = np.sum(cg_cap[:,0] * cg_cap[:,1] * w_cap * t_cap)
+    B = cg_airfoil[1] + (My * Ixx - Mx * Ixy) / (Mx * Iyy - My * Ixy) * cg_airfoil[0]
+
+
+
+
+
+
 # length, segments = calculate_spline_length(newx_airfoil, newy_airfoil)
 # print(length)
 # print(segments)

@@ -1,4 +1,6 @@
 import numpy as np
+from constants import df
+
 #   Clean this code
 
 class fuselage:

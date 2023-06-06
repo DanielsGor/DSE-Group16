@@ -171,22 +171,25 @@ y_splines = split_list_at_numbers(newy_airfoil, y_spars)
 spline_lengths = []
 spline_cgx = []
 spline_cgy = []
-for i in range(len(x_splines)):
-    spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i])) #use new function ONNO
-    spline_cgx.append(np.average(x_splines[i])) #use new function ONNO
-    spline_cgy.append(np.average(y_splines[i])) #use new function ONNO
 
+print(calculate_spline_length(x_splines[i], y_splines[i]))
+for i in range(len(x_splines)):
+    spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i])[0]) #use new function ONNO
+    spline_cgx.append(calculate_spline_length(x_splines[i], y_splines[i][2][0])) #use new function ONNO
+    spline_cgy.append(calculate_spline_length(x_splines[i], y_splines[i][2][1])) #use new function ONNO
+
+print(spline_lengths)
 
 total_area = 0
 total_areax = 0
 total_areay = 0
 for i in range(len(spline_lengths)):
-    total_area.append(spline_lengths[i])
-    total_area.append(spararea)
-    total_areax.append(spline_lengths[i]*spline_cgx[i])
-    total_areax.append(sparx_cg*spararea)
-    total_areay.append(spline_lengths[i]*spline_cgy[i])
-    total_areay.append(spary_cg * spararea)
+    total_area += spline_lengths[i]
+    total_area += spararea
+    total_areax += spline_lengths[i]*spline_cgx[i]
+    total_areax += sparx_cg*spararea
+    total_areay += spline_lengths[i]*spline_cgy[i]
+    total_areay += spary_cg * spararea
 
 totalcg_x = total_areax/total_area
 totalcg_y = total_areay/total_area
@@ -198,7 +201,7 @@ for i in sparlocation:
     x_index = find_closest_number_indices(newx_airfoil, i)
     plt.vlines(x=i, ymin=newy_airfoil[x_index[1]], ymax=newy_airfoil[x_index[0]], colors='black', ls='solid', lw=2)
 plt.plot(newx_airfoil, newy_airfoil, 'r')  # 'ro' specifies red color and circle markers
-plt.scatter(sparx_cg, spary_cg)
+plt.scatter(totalcg_x, totalcg_y)
 plt.xlabel('X-axis')
 plt.ylabel('Y-axis')
 plt.title('Local airfoil geometry')

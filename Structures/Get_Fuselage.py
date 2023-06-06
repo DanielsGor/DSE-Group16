@@ -22,7 +22,8 @@ import numpy as np
 #         self.p = None
 
 
-def fuselage_internal_loads(external_loads, fuselage_dimensions):
+def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
+    #   Simplify arrays to make sure that they match the output arrays size
     # Possible improvements: Include bending contribution due to wing drag and thrust
     g = 9.80665 # [m/s^2] gravitational acceleration
     n_max = 3.75 # Maximum load factor
@@ -52,52 +53,108 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions):
     wing_tail_weight = wing_lift - fuselage_mass * g
 
     #   For distributions, there is an increment per millimeter of fuselage length
-    n_increments = fuselage_length * 1000
+    n_increments = int(fuselage_length * 1000)
+    n_wing_start = int(wing_start_location * 1000)
+    n_wing_end = int(wing_end_location * 1000)
+
+    #   Create a function to add arrays of different size, so the output arrays have a consistent size
+    def add_arrays(array1, array2):
+        if len(array1) < len(array2):
+            array3 = array2.copy()
+            array3[:len(array1)] += array1
+        else:
+            array3 = array1.copy()
+            array3[:len(array2)] += array2
+        return array3
 
     #   Assume the critical parachute deployment load is applied longitudinally at the center of the fuselage
-    parachute_drag = parachute_drag_coefficient * 0.5 * rho * cruise_velocity**2 * (parachute_diameter / 2)**2 * np.pi
+    parachute_deployment_drag = parachute_drag_coefficient * 0.5 * rho * cruise_velocity**2 * (parachute_diameter / 2)**2 * np.pi
 
 
     #   Assume that the cushion force is evenly distributed over the length of the fuselage
     cushion_lift_distribution = - n_max * fuselage_mass * g / fuselage_length
-    cushion_lift_distribution = np.full_like(np.arange(0, n_increments), cushion_lift_distribution)
+    cushion_lift_distribution = cushion_lift_distribution * np.ones(n_increments)
 
     #   Assume that the launch force acts as a point load at the center of the fuselage, in the longitudinal direction
     launch_force = - launcher_energy / track_length
 
-
     #   Assume that the fuselage drag is that of a cube for conceptual design
-    fuselage_drag = cube_drag_coefficient * 0.5 * rho * cruise_velocity**2 * \
-                    fuselage_width * fuselage_height
-    fuselage_drag_distribution = np.full_like(np.arange(0, n_increments), fuselage_drag)
+    fuselage_drag = cube_drag_coefficient * 0.5 * rho * cruise_velocity**2 * fuselage_width * fuselage_height
+    fuselage_drag_distribution = fuselage_drag * np.ones(n_increments)
 
-    wing_drag_distribution = np.append(np.zeros(n_increments * wing_start_location // fuselage_length),
-        np.full_like(np.arange(0, n_increments * (fuselage_length - wing_start_location) // fuselage_length), wing_drag))
+    wing_drag_distribution = np.append(np.zeros(n_wing_start), wing_drag * np.ones(n_increments - n_wing_start))
 
     propeller_thrust = - fuselage_drag + wing_drag
 
     lift_distribution = - wing_lift / root_chord
-    lift_distribution = np.append(np.zeros(n_increments * wing_start_location // fuselage_length),
-                                  np.full_like(np.arange(0, n_increments * root_chord // fuselage_length), lift_distribution))
+    lift_distribution = np.concatenate((np.zeros(n_wing_start),
+                                  lift_distribution * np.ones(n_wing_end - n_wing_start), np.zeros(n_increments - n_wing_end)))
+
 
     wing_tail_distribution = wing_tail_weight / root_chord
-    wing_tail_distribution = np.append(np.zeros(n_increments * wing_start_location // fuselage_length),
-        np.full_like(np.arange(0, n_increments * root_chord // fuselage_length), wing_tail_distribution))
+    wing_tail_distribution = np.concatenate((np.zeros(n_wing_start),
+                                  wing_tail_distribution * np.ones(n_wing_end - n_wing_start), np.zeros(n_increments - n_wing_end)))
 
     weight_distribution = fuselage_mass * g / fuselage_length
-    weight_distribution = np.full_like(np.arange(0, n_increments), weight_distribution)
+    weight_distribution = weight_distribution * np.ones(n_increments)
 
+    #   Initialise output arrays
+    shear_distribution = np.zeros(n_increments)
+    moment_distribution = np.zeros(n_increments)
+    normal_load_distribution = np.zeros(n_increments)
 
     #   Cruise load analysis
-    shear_distribution_slope = - weight_distribution + lift_distribution + wing_tail_distribution
-    shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
+    cruise_shear_distribution_slope = - weight_distribution + lift_distribution + wing_tail_distribution
+    cruise_shear_distribution = np.cumsum(cruise_shear_distribution_slope * 0.001)
 
-    moment_distribution_slope = np.cumsum(shear_distribution * 0.001)
+    cruise_moment_distribution = np.cumsum(cruise_shear_distribution * 0.001)
 
-    normal_load_distribution = - (fuselage_drag_distribution + wing_drag_distribution)
+    cruise_normal_load_distribution = - (fuselage_drag_distribution + wing_drag_distribution)
 
-    #   Launch load analysis
+    if type == 'cruise':
+        shear_distribution = cruise_shear_distribution
 
+        moment_distribution = cruise_moment_distribution
+
+        normal_load_distribution = cruise_normal_load_distribution
+
+    elif type == 'launch':
+        #   Launch load analysis
+        shear_distribution = cruise_shear_distribution
+
+        moment_distribution = cruise_moment_distribution
+
+        normal_load_distribution = np.append(-launch_force * np.ones(n_increments // 2),
+                                                    launch_force * np.ones(n_increments // 2))
+
+    elif type == 'deployment':
+        #   Parachute deployment load analysis
+        shear_distribution = cruise_shear_distribution
+
+        moment_distribution = cruise_moment_distribution
+
+        normal_load_distribution = np.append(-parachute_deployment_drag * np.ones(n_increments // 2),
+                                                       parachute_deployment_drag * np.ones(n_increments // 2))
+
+    elif type == 'landing':
+        #   Cushion load analysis
+        shear_distribution_slope = - weight_distribution + wing_tail_distribution + cushion_lift_distribution
+        shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
+
+        moment_distribution = np.cumsum(shear_distribution * 0.001)
+
+        normal_load_distribution = np.zeros(n_increments)
+
+    elif type == 'max':
+        #   Maximum load analysis
+        shear_distribution_slope = - weight_distribution + n_max * lift_distribution + wing_tail_distribution
+        shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
+
+        moment_distribution = np.cumsum(shear_distribution * 0.001)
+
+        normal_load_distribution = - n_max * (fuselage_drag_distribution + wing_drag_distribution)
+
+    return shear_distribution, moment_distribution, normal_load_distribution
 
 
 def fuselage_layout(internal_loads, fuselage_dimensions, stringer_dimensions, material_properties):

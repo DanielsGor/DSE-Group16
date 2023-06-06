@@ -116,9 +116,12 @@ def calculate_spline_length(x, y):
         segment_cgx.append((x1+x2)/2)
         segment_cgy.append((y1+y2)/2)
         segments = np.array([segment_length, segment_cgx, segment_cgy])
+    cg_spine = np.array([segments[0]*segments[1], segments[0]*segments[2]])
     total_length = np.sum(segment_length)
 
-    return total_length, segments
+    return total_length, segments, cg_spine
+
+
 
 # length, segments = calculate_spline_length(newx_airfoil, newy_airfoil)
 # print(length)

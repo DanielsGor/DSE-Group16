@@ -30,7 +30,7 @@ Vs = [V]
 pitch_rates = [0]
 iter = 0
 Rs = [0]
-
+accs  =[0]
 
 while global_pitch_angle > np.deg2rad(-climb_angle):
     time = times[-1] + dt
@@ -41,6 +41,7 @@ while global_pitch_angle > np.deg2rad(-climb_angle):
     R = V**2 / a_centripetal
     Rs.append(R)
     pitch_rates.append(V/R)
+    accs.append(a_centripetal)
     d_circle_angle = V/R *dt
 
     x_n = x[-1] + R * np.sin(global_pitch_angle) - R * np.sin(global_pitch_angle - d_circle_angle)
@@ -55,9 +56,15 @@ while global_pitch_angle > np.deg2rad(-climb_angle):
     times.append(time)
     Vs.append(V)
 
+Ls = [cl_cruise * 1/2 * rho * Vcurrent ** 2 * S for Vcurrent in Vs]
+Ws = m * g * np.cos(global_pitch_angles)
+ns = Ls/Ws
+print(V)
+
 print (np.mean(pitch_rates), max(pitch_rates))
 # plt.plot(times, Rs)
-plt.plot (x,y)
+print (max(ns))
+plt.plot (times,ns)
 plt.show()
 
 

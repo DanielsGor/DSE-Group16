@@ -20,7 +20,7 @@ A = 7.911
 cd_cruise = cD0 + cl_cruise**2/(np.pi * A *e) 
 
 
-T_climb = m*g*np.sin(-climb_angle) + cd_cruise * S * 0.5 * V **2 * rho 
+T_climb = m*g*np.sin(np.deg2rad(-climb_angle)) + cd_cruise * S * 0.5 * V**2 * rho
 
 x = [0]
 y = [0]
@@ -28,18 +28,19 @@ global_pitch_angles = [glide_angle]
 times = [0]
 Vs = [V]
 pitch_rates = [0]
+iter = 0
+Rs = [0]
+
 
 while global_pitch_angle > np.deg2rad(-climb_angle):
     time = times[-1] + dt
     global_pitch_angle = global_pitch_angles[-1]
     V = Vs[-1]
-    a_tangential= (T_climb + m*g * np.sin(global_pitch_angle) - cd_cruise *0.5 * rho * V**2 * S)/m
-    a_centripetal = cl_cruise * 0.5 * rho * V**2 * S/m - g * np.cos (global_pitch_angle)
-
+    a_tangential = (T_climb + m*g * np.sin(global_pitch_angle) - cd_cruise *0.5 * rho * V**2 * S)/m
+    a_centripetal = cl_cruise * 0.5 * rho * V**2 * S/m - g * np.cos(global_pitch_angle)
     R = V**2 / a_centripetal
-
+    Rs.append(R)
     pitch_rates.append(V/R)
-
     d_circle_angle = V/R *dt
 
     x_n = x[-1] + R * np.sin(global_pitch_angle) - R * np.sin(global_pitch_angle - d_circle_angle)
@@ -55,8 +56,8 @@ while global_pitch_angle > np.deg2rad(-climb_angle):
     Vs.append(V)
 
 print (np.mean(pitch_rates), max(pitch_rates))
-plt.plot(times, pitch_rates)
-#plt.plot (x,y)
+# plt.plot(times, Rs)
+plt.plot (x,y)
 plt.show()
 
 

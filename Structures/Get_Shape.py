@@ -172,11 +172,11 @@ spline_lengths = []
 spline_cgx = []
 spline_cgy = []
 
-print(calculate_spline_length(x_splines[i], y_splines[i]))
+
 for i in range(len(x_splines)):
     spline_lengths.append(calculate_spline_length(x_splines[i], y_splines[i])[0]) #use new function ONNO
-    spline_cgx.append(calculate_spline_length(x_splines[i], y_splines[i][2][0])) #use new function ONNO
-    spline_cgy.append(calculate_spline_length(x_splines[i], y_splines[i][2][1])) #use new function ONNO
+    spline_cgx.append(calculate_spline_length(x_splines[i], y_splines[i])[2][0]) #use new function ONNO
+    spline_cgy.append(calculate_spline_length(x_splines[i], y_splines[i])[2][1]) #use new function ONNO
 
 print(spline_lengths)
 

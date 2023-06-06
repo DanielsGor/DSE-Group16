@@ -25,6 +25,7 @@ df = df.to_numpy()
 df = df.T
 df = df.tolist()
 df = dict(zip(df[0], df[1]))
+print(df)
 
 # for index, value in df[['Symbol in code', 'Value']].values:
 #     locals()[index] = value

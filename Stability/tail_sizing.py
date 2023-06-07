@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 from vertical_tail_sizing import main_vtail
-from horizontal_tail_sizing_final import main_htail
+from Horizontal_tail_sizing_final import main_htail
 from constants import S, b, MAC
 
 vtail_volume = main_vtail()

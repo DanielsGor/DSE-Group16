@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from constants import g, rho, T, V_cruise, m_tot, ROC, Cm_ac, b, S, A, MAC, lamda, c_r, c_t, C_l_alpha, b_fus, x_bar_ac
 from matplotlib.widgets import Slider, Button
 
+
 """
 This is a program to size the horizontal tail based on the approach described by Torenbeek's book called Synthesis of 
 Subsonic Airplane Design. The program uses various inputs from mainly the aerodynamics department and gives an
@@ -10,27 +11,29 @@ interactive scissor plot in which the cg range can be varied and optimized visua
 tail volume which can be obtained by using the button in the plot.
 """
 
-#%% Define Input Parameters
-r = 50                          # turn radius [m]
-ROC = 5                         # rate of climb [m/s]
+# r = 50                          # turn radius [m]
+# ROC = 5                         # rate of climb [m/s]
+
+####Tail####
 delta_h = 80                    # change in altitude for climb [m]
 A_h= 5                          # aspect ratio horizontal tail [-]
-lamda_h = 0.8                   # taper ratio horizontal tail [-]
+lamda_h = 1.0                   # taper ratio horizontal tail [-]
 C_l_alpha_h = 0.1 * 180/np.pi   # lift curve slope horizontal tail [-]
-SM = 0.10                       # stability margin [-]
-x_cg_min_bar = 0.15             # minimum cg position [-]
-x_cg_max_bar = 0.35             # maximum cg position [-]
-delta_x_cg_bar = x_cg_max_bar - x_cg_min_bar # [-] cg range, normalised by mac
 
-#%% Assume several parameters
+
+####Stability####
+SM = 0.10                       # stability margin [-]
+x_cg_min_bar = 0.25             # minimum cg position [-]
+x_cg_max_bar = 0.295             # maximum cg position [-]
+delta_x_cg_bar = x_cg_max_bar - x_cg_min_bar # [-] cg range, normalised by mac
+x_bar_cg_range = np.linspace(-0.5, 1, 1000)
+
+
+####Airflow interactions####
 VhV2 = 1                        # (V_h/V)^2 [-]
 deda = 0                        # downwash gradient [-]
 
-
-
-#%% Functions used in the program
-
-x_bar_cg_range = np.linspace(-0.5, 1, 1000)
+####Functions####
 
 def calculate_C_L_w_alpha(A, lamda, C_l_alpha):
     '''
@@ -81,17 +84,17 @@ def calculate_C_L_h(A_h):
 
     return C_L_h
 
-
-def calculate_v_climb(r, ROC, delta_h):
-
-    '''
-    Calculates the climb speed based on r, ROC and delta_h
-    '''
-
-    climb_angle = np.arctan(delta_h / (np.pi * r))  # [rad] climb angle
-    v_climb = ROC / np.sin(climb_angle)  # [m/s] climb speed
-
-    return v_climb
+#The v_climb function has been replaced by the v_climb requirement
+# def calculate_v_climb(r, ROC, delta_h):
+#
+#     '''
+#     Calculates the climb speed based on r, ROC and delta_h
+#     '''
+#
+#     climb_angle = np.arctan(delta_h / (np.pi * r))  # [rad] climb angle
+#     v_climb = ROC / np.sin(climb_angle)  # [m/s] climb speed
+#
+#     return v_climb
 
 
 def calculate_C_L_Ah(W, v_climb, S):
@@ -206,7 +209,8 @@ def main_htail():
     Main function
     '''
 
-    v_climb = calculate_v_climb(r, ROC, delta_h)
+    # v_climb = calculate_v_climb(r, ROC, delta_h)
+    v_climb = 15.1
     C_L_h_alpha = calculate_C_L_h_alpha(A_h, lamda_h, C_l_alpha_h)
     C_L_w_alpha = calculate_C_L_w_alpha(A, lamda, C_l_alpha)
     C_L_Ah_alpha = calculate_C_L_Ah_alpha(C_L_w_alpha, lamda, b, b_fus, c_r, S)

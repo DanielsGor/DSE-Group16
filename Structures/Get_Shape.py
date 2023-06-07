@@ -124,6 +124,20 @@ def calculate_spline_length(x, y):
 
 a , b, cg_spine = calculate_spline_length(x_airfoil, y_airfoil)
 
+def IdealisedBoom(w_cap, t_cap, x_cgcap, y_cgcap, t_skin, cg_airfoil, Mx, My):
+    cg_cap = np.array([x_cgcap, y_cgcap])
+    for i in range(len(cg_cap[0])):
+        cg_cap[:,i] = cg_airfoil - cg_cap[:,i]
+    Ixx = np.sum(cg_cap[:,1] ** 2 * w_cap * t_skin)
+    Iyy = np.sum(cg_cap[:,0] ** 2 * w_cap * t_skin)
+    Ixy = np.sum(cg_cap[:,0] * cg_cap[:,1] * w_cap * t_cap)
+    B = cg_airfoil[1] + (My * Ixx - Mx * Ixy) / (Mx * Iyy - My * Ixy) * cg_airfoil[0]
+
+
+
+
+
+
 # length, segments = calculate_spline_length(newx_airfoil, newy_airfoil)
 # print(length)
 # print(segments)
@@ -179,23 +193,23 @@ for i in range(len(x_splines)):
     spline_cgy.append(calculate_spline_length(x_splines[i], y_splines[i])[2][1]) #use new function ONNO
 
 print(spline_lengths)
+print(spline_cgx)
+print(spline_cgy)
+
 
 total_area = 0
 total_areax = 0
 total_areay = 0
 for i in range(len(spline_lengths)):
-    total_area += spline_lengths[i]
+    total_area += spline_lengths[i]*skin_t
     total_area += spararea
-    total_areax += spline_lengths[i]*spline_cgx[i]
+    total_areax += spline_lengths[i]*skin_t*spline_cgx[i]
     total_areax += sparx_cg*spararea
-    total_areay += spline_lengths[i]*spline_cgy[i]
+    total_areay += spline_lengths[i]*skin_t*spline_cgy[i]
     total_areay += spary_cg * spararea
 
 totalcg_x = total_areax/total_area
 totalcg_y = total_areay/total_area
-
-
-
 
 for i in sparlocation:
     x_index = find_closest_number_indices(newx_airfoil, i)

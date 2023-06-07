@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 # from constants import df
 #   Clean this code
 
@@ -41,6 +42,7 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
     fuselage_height = fuselage_dimensions['height']
     wing_xlocation = fuselage_dimensions['wing_xlocation']
     root_chord = fuselage_dimensions['root_chord']
+    fuselage_mass = fuselage_dimensions['mass']
     wing_start_location = fuselage_length - wing_xlocation - (root_chord / 2)
     wing_end_location = wing_start_location + root_chord
 
@@ -48,14 +50,13 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
     wing_drag = external_loads['wing_drag']
     wing_moment = external_loads['wing_moment']
 
-    fuselage_mass = external_loads['fuselage_mass']
-
     wing_tail_weight = wing_lift - fuselage_mass * g
 
     #   For distributions, there is an increment per millimeter of fuselage length
     n_increments = int(fuselage_length * 1000)
     n_wing_start = int(wing_start_location * 1000)
     n_wing_end = int(wing_end_location * 1000)
+    n_root_chord = int(root_chord * 1000)
 
     #   Create a function to add arrays of different size, so the output arrays have a consistent size
     def add_arrays(array1, array2):
@@ -104,7 +105,7 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
     normal_load_distribution = np.zeros(n_increments)
 
     #   Cruise load analysis
-    cruise_shear_distribution_slope = - weight_distribution + lift_distribution + wing_tail_distribution
+    cruise_shear_distribution_slope = - add_arrays(add_arrays(weight_distribution, lift_distribution), wing_tail_distribution)
     cruise_shear_distribution = np.cumsum(cruise_shear_distribution_slope * 0.001)
 
     cruise_moment_distribution = np.cumsum(cruise_shear_distribution * 0.001)
@@ -124,8 +125,8 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
 
         moment_distribution = cruise_moment_distribution
 
-        normal_load_distribution = np.append(-launch_force * np.ones(n_increments // 2),
-                                                    launch_force * np.ones(n_increments // 2))
+        normal_load_distribution = np.append(launch_force * np.ones(n_increments // 2),
+                                                    -launch_force * np.ones(n_increments // 2))
 
     elif type == 'deployment':
         #   Parachute deployment load analysis
@@ -133,12 +134,12 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
 
         moment_distribution = cruise_moment_distribution
 
-        normal_load_distribution = np.append(-parachute_deployment_drag * np.ones(n_increments // 2),
-                                                       parachute_deployment_drag * np.ones(n_increments // 2))
+        normal_load_distribution = np.append(parachute_deployment_drag * np.ones(n_increments // 2),
+                                                       -parachute_deployment_drag * np.ones(n_increments // 2))
 
     elif type == 'landing':
         #   Cushion load analysis
-        shear_distribution_slope = - weight_distribution + wing_tail_distribution + cushion_lift_distribution
+        shear_distribution_slope = - add_arrays(add_arrays(weight_distribution, wing_tail_distribution), cushion_lift_distribution)
         shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
 
         moment_distribution = np.cumsum(shear_distribution * 0.001)
@@ -147,12 +148,12 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
 
     elif type == 'max':
         #   Maximum load analysis
-        shear_distribution_slope = - weight_distribution + n_max * lift_distribution + wing_tail_distribution
+        shear_distribution_slope = - add_arrays(add_arrays(weight_distribution, n_max * lift_distribution), wing_tail_distribution)
         shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
 
         moment_distribution = np.cumsum(shear_distribution * 0.001)
 
-        normal_load_distribution = - n_max * (fuselage_drag_distribution + wing_drag_distribution)
+        normal_load_distribution = - n_max * add_arrays(fuselage_drag_distribution, wing_drag_distribution)
 
     return shear_distribution, moment_distribution, normal_load_distribution
 
@@ -223,19 +224,17 @@ def fuselage_layout(internal_loads, fuselage_dimensions, stringer_dimensions, ma
 # internal_shear = np.append(np.arange(0, 50), np.arange(50, 0, -1))
 # internal_bending = np.append(100 * np.ones(50), 50 * np.ones(50))
 # internal_normal = np.append(50 * np.ones(50), 100 * np.ones(50))
-fuselage_dimensions = {'width': 0.15, 'height': 0.15, 'length': 0.7}
+fuselage_dimensions = {'width': 0.15, 'height': 0.15, 'length': 0.7, 'wing_xlocation': 0.4, 'root_chord': 0.49078, 'mass': 7}
+external_loads = {'wing_lift': 700, 'wing_drag': 100, 'wing_moment': 100}
 stringer_dimensions = {'width': 0.01, 'height': 0.01, 'thickness': 0.001}
 material_properties = {'tensile strength': 7.501, 'compressive strength': 6.53, 'shear strength': 1.88}
-loads = {'shear': np.append(np.arange(0, 50), np.arange(50, 0, -1)),
-         'bending': np.append(100 * np.ones(50), 50 * np.ones(50)),
-         'normal': np.append(50 * np.ones(50), 100 * np.ones(50))}
 
+shear, moment, normal = fuselage_internal_loads(external_loads, fuselage_dimensions, 'max')
+loads = {'shear': shear,
+         'bending': moment,
+         'normal': normal}
 
-d = fuselage_layout(loads, fuselage_dimensions, stringer_dimensions, material_properties)
+normal_stress, n_stringers_normal, shear_stress, n_stringers_shear = \
+    fuselage_layout(loads, fuselage_dimensions, stringer_dimensions, material_properties)
 
-
-
-print(d)
-
-
-
+print(normal_stress, n_stringers_normal, shear_stress, n_stringers_shear)

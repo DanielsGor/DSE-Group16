@@ -124,14 +124,30 @@ def calculate_spline_length(x, y):
 
 a , b, cg_spine = calculate_spline_length(x_airfoil, y_airfoil)
 
-def IdealisedBoom(w_cap, t_cap, x_cgcap, y_cgcap, t_skin, cg_airfoil, Mx, My):
+def IdealisedBoom(w_cap, t_cap, x_cgcap, y_cgcap, t_skin, cg_airfoil, Mx, My, spline, it):
     cg_cap = np.array([x_cgcap, y_cgcap])
     for i in range(len(cg_cap[0])):
-        cg_cap[:,i] = cg_airfoil - cg_cap[:,i]
-    Ixx = np.sum(cg_cap[:,1] ** 2 * w_cap * t_skin)
-    Iyy = np.sum(cg_cap[:,0] ** 2 * w_cap * t_skin)
-    Ixy = np.sum(cg_cap[:,0] * cg_cap[:,1] * w_cap * t_cap)
-    B = cg_airfoil[1] + (My * Ixx - Mx * Ixy) / (Mx * Iyy - My * Ixy) * cg_airfoil[0]
+        cg_cap[:,i] = cg_cap[:,i] - cg_airfoil
+    sigma = np.zeros(len(cg_cap[0]))
+    B = np.full(4, w_cap * t_cap)
+    Bskin = np.zeros(4)
+    Btot = np.zeros((it,4))
+    for i in range(it):
+        Ixx = np.sum(cg_cap[1,:] ** 2 * (B + Bskin))
+        Iyy = np.sum(cg_cap[0,:] ** 2 * (B + Bskin))
+        Ixy = np.sum(cg_cap[0,:] * cg_cap[1,:] * (B + Bskin))
+        for j in range(len(cg_cap[0])):
+            # Calculates sigma in whatever Mx and My are given in divided by mm^2
+            sigma[j] = ((Mx * Iyy - My * Ixy) / (Ixx * Iyy - Ixy ** 2)) * cg_cap[1, j] + ((My * Ixx - Mx * Ixy) / (Ixx * Iyy - Ixy ** 2)) * cg_cap[0, j]
+        Bskin[0] = t_skin * (np.abs(cg_cap[1,0] - cg_cap[1,1])) / 6 * (2 + sigma[1]/sigma[0]) + t_skin * (spline[1]) / 6 * (2 + sigma[2]/sigma[0])
+        Bskin[1] = t_skin * (np.abs(cg_cap[1,1] - cg_cap[1,0])) / 6 * (2 + sigma[0]/sigma[1]) + t_skin * (spline[3]) / 6 * (2 + sigma[3]/sigma[1])
+        Bskin[2] = t_skin * (np.abs(cg_cap[1,2] - cg_cap[1,3])) / 6 * (2 + sigma[3]/sigma[2]) + t_skin * (spline[1]) / 6 * (2 + sigma[0]/sigma[1])
+        Bskin[3] = t_skin * (np.abs(cg_cap[1,3] - cg_cap[1,2])) / 6 * (2 + sigma[2]/sigma[3]) + t_skin * (spline[3]) / 6 * (2 + sigma[1]/sigma[3])
+        Btot[i,:] = B + Bskin
+    return Btot
+
+
+
 
 
 
@@ -162,9 +178,9 @@ span_x = .1         #meters
 C_root = 6          #meters
 C_tip = 4           #meters
 span = 2            #meters
-spar_w = .2         #meters
-spar_t = .2         #meters
-skin_t = .2         #meters
+spar_w = 200         #mm
+spar_t = 20         #mm
+skin_t = 1         #mm
 
 
 #MAIN PROGRAM---------------------------------------------------------------------------------------------

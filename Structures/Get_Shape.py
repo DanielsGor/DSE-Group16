@@ -209,23 +209,23 @@ for i in range(len(x_splines)):
     spline_cgy.append(calculate_spline_length(x_splines[i], y_splines[i])[2][1]) #use new function ONNO
 
 print(spline_lengths)
+print(spline_cgx)
+print(spline_cgy)
+
 
 total_area = 0
 total_areax = 0
 total_areay = 0
 for i in range(len(spline_lengths)):
-    total_area += spline_lengths[i]
+    total_area += spline_lengths[i]*skin_t
     total_area += spararea
-    total_areax += spline_lengths[i]*spline_cgx[i]
+    total_areax += spline_lengths[i]*skin_t*spline_cgx[i]
     total_areax += sparx_cg*spararea
-    total_areay += spline_lengths[i]*spline_cgy[i]
+    total_areay += spline_lengths[i]*skin_t*spline_cgy[i]
     total_areay += spary_cg * spararea
 
 totalcg_x = total_areax/total_area
 totalcg_y = total_areay/total_area
-
-
-
 
 for i in sparlocation:
     x_index = find_closest_number_indices(newx_airfoil, i)

@@ -53,6 +53,13 @@ def deflection_angle_by_pointforce(force, length, E_modulus, Ix, Mboom):
     deflection = ((force*length**2)/(2*E_modulus*Ix)+(Mboom/length*length**3)/(6*E_modulus*Ix))*180/np.pi
     return(deflection)
 
+def material_properties(mat):
+    if mat == 'balsa'
+        rho =
+    elif mat == 'aluminum'
+        rho =
+    return ()
+
 def get_Lh_Sh(L, xdif):
     lh = xdif+L
     Lh = 10.93/lh

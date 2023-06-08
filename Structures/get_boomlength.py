@@ -31,13 +31,14 @@ def inertia_thin_walled_circular_section(thickness, diameter)
 def circular_boom_weight(type, thicknessV, thicknessH, rho, length, width, height):
     if type == 'circular':
         mass = np.pi*width*thicknessV*rho*length
+        Inertia ==
     elif type == 'rectangular':
         mass = (2*width*thicknessH+2*height*thicknessV)*length*rho
     return(mass)
 
 
-def deflection_angle_by_pointforce(force, length, E_modulus, Ix):
-    d
+def deflection_angle_by_pointforce(force, length, E_modulus, Ix, weightperdistance):
+    deflection = ((force*length**2)/(2*E_modulus*Ix)+(weightperdistance*length**2)/(6*E_modulus*Ix))*(180/np.pi)
 
 def get_Lh_Sh(L, xdif):
     lh = xdif+L

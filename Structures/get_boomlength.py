@@ -76,5 +76,17 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     print(maximum_stress)
     return(M)
 
-finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "circular")
+
+lengthrange = np.arange(0, 2, .1)
+tskinrange = np.arange(.0001, .001, .0001)
+thicknessVrange = np.arange(.0001, .001, .0001)
+thicknessHrange = np.arange(.0001, .001, .0001)
+widthrange = np.arange(.01, .10, .01)
+heightrange = np.arange(.01, .10, .01)
+
+Masses = []
+for i in lengthrange:
+    finalmass = finalmass(i, 1, 1, 1, 1, 1, 1, 1, 1, 1, "circular")
+
+
 print(finalmass)

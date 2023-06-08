@@ -2,17 +2,10 @@ import numpy as np
 import pandas as pd
 import itertools
 import matplotlib.pyplot as plt
-from create_sample_data import create_dummy_data
-import os
+from preprocessing import calc_aero_forces
 
-#model data
-S = 0.1 # m^2
-c = 0.2 # m
-rho = 1.225 # kg/m^3
-v = 15 # m/s
 
-def get_data():
-    data = create_dummy_data()
+def combine_data(data):
     test_matrix = pd.read_excel('Stability\\wind_tunnel_test\\wind_tunnel_test_matrix.xlsx')
 
     df = pd.concat([test_matrix, data], axis=1)
@@ -33,7 +26,7 @@ def split_data(df):
 
     return df_1, df_2, df_3, df_4
 
-def plotting(df, plot=True):
+def plotting(df):
     #get variables used in test series
     alpha_range = list(df['alpha'].drop_duplicates())
     V_pp_range = list(df['V_pp'].drop_duplicates())
@@ -95,12 +88,11 @@ def plotting(df, plot=True):
     return
 
 
-
 def main():
-    df = get_data()
+    df = combine_data()
     df = get_coeff(df, S, c, rho, v)
     df_1, df_2, df_3, df_4 = split_data(df)
-    plotting(df_4, plot=True)
+    plotting(df_4)
 
 if __name__ == '__main__':
     main()

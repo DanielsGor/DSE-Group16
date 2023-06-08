@@ -34,12 +34,6 @@ def BendingStress(Mx, My, Ixx, Iyy, type, width, height):
     return(max_stress, max_stress_loc)
 
 
-
-def inertia_thin_walled_circular_section(thickness, diameter):
-    Ix = (np.pi * thickness * diameter ** 2) / 8
-    J = (np.pi * thickness * diameter ** 2) / 4
-    return(Ix, J)
-
 def boom_properties(type, thicknessV, thicknessH, rho, length, width, height):
     Ixx = None
     Iyy = None
@@ -69,16 +63,36 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom):
+def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom, type):
     Lh, Sh = get_Lh_Sh(length, xdif)
     Mempennage = emp_weight(Sh, tskin, rho_tail)
-    Mboom, Ixx, Iyy = boom_properties('circular', thicknessV, thicknessH, rho_boom, length, width, height)
+    Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
     M = Mboom + Mempennage
-    deflection = deflection_angle_by_pointforce(Lh, length, E_modulus_boom, Ixx, Mboom)
-    maximum_stress = 1
-    print(deflection)
-    print(maximum_stress)
+    F = Lh - Mempennage * 9.81
+    deflection = deflection_angle_by_pointforce(F, length, E_modulus_boom, Ixx, Mboom)
+    My = F * length
+    maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
     return(M)
 
-finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+lengthrange = np.arange(0, 2, .1)
+tskinrange = np.arange(.0001, .001, .0001)
+thicknessVrange = np.arange(.0001, .001, .0001)
+thicknessHrange = np.arange(.0001, .001, .0001)
+widthrange = np.arange(.01, .10, .01)
+heightrange = np.arange(.01, .10, .01)
+typ = ['rectangular', 'circular']
+
+Masses = []
+for i in lengthrange:
+    for j in tskinrange:
+        for k in thicknessHrange:
+            for l in thicknessHrange:
+                for m in widthrange:
+                    for n in heightrange:
+                        for o in typ:
+
+                            set.append(ijk)
+                            Masses.append(finalmass(i, .0222, j, 100, k, l, 100, m, n, 2037*10**6, o))
+
 print(finalmass)

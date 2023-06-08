@@ -1,5 +1,13 @@
 import numpy as np
 
+lst1 = [[3,2],[3,4],[1,6]]
+lst = np.array(lst1)
+
+min = np.amin(lst[:,0])
+val =np.where(lst[:, 0] == min)
+
+print (val[0][0])
+
 alpha_root_local= 4
 alpha_cl0 = 0
 c_r_local = 1

@@ -39,7 +39,13 @@ accs  =[0]
 counter = 0
 
 
-while times[-1] < 500: #global_pitch_angle > np.deg2rad(-climb_angle):
+def pitch_dot2 (dt,pitch):
+    dot2 = []
+    for idx,value in enumerate(pitch[0:-3]):
+        dot2.append((pitch[idx + 2] - 2 * pitch[idx + 1] + pitch[idx]) /dt**2)
+    return dot2
+
+while global_pitch_angle > np.deg2rad(-climb_angle):
     time = times[-1] + dt
     global_pitch_angle = global_pitch_angles[-1]
     V = Vs[-1]
@@ -73,11 +79,12 @@ ns = Ls/Ws
 
 # plt.plot(times, ns)
 # plt.show()
-# test  = []
-# for i in pitch_rates[1:-1]:
-#     test.append()
 
-plt.plot(times,)
+
+plt.plot(times[:-3],pitch_dot2(dt,global_pitch_angles))
+plt.show()
+
+plt.plot(times,pitch_rates)
 plt.show()
 
 plt.plot (x,y)
@@ -91,3 +98,6 @@ print("The limiting pitch rate is: ", max(pitch_rates)*180/np.pi, " deg/s")
 print("The limiting load factor is: ", max(ns))
 
 print(a_tangential, a_centripetal)
+
+print((pitch_rates[1]-pitch_rates[0])/dt)
+print(min(pitch_dot2(dt,global_pitch_angles)))

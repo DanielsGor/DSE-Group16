@@ -1,26 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# from constants import df
-#   Clean this code
-
-# class fuselage:
-#     def __init__(self):
-#         # create self attributes with the lines of code below
-#         self.length = df['fus_l']  # Length of the fuselage in meters
-#         self.width = df['fus_w']  # Width of the fuselage in meters
-#         self.height = df['fus_h']  # Height of the fuselage in meters
-#         self.skin_thickness = df['t_skin']  # Thickness of the fuselage skin in meters
-#         self.stringer_pitch = df['str_pitch']  # Spacing between stringers in meters
-#         self.stringer_width = df['str_w']  # Width of the stringers in meters
-#         self.stringer_height = df['str_h']  # Height of the stringers in meters
-#         self.stringer_thickness = df['str_t']  # Thickness of the stringers in meters
-#         self.balsa_tens = df['balsa_tens']  # Tensile strength of balsasud ultralite in MPa
-#         self.balsa_comp = df['balsa_comp']  # Compressive strength of balsasud ultralite in MPa
-#         self.internal_shear = None
-#         self.internal_bending = None
-#         self.pitch_list = None
-#         self.normal_stress = None
-#         self.p = None
 
 
 def fuselage_internal_loads(external_loads, fuselage_dimensions, type):

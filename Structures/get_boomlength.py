@@ -69,10 +69,10 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom):
+def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom, type):
     Lh, Sh = get_Lh_Sh(length, xdif)
     Mempennage = emp_weight(Sh, tskin, rho_tail)
-    Mboom, Ixx, Iyy = boom_properties('circular', thicknessV, thicknessH, rho_boom, length, width, height)
+    Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
     M = Mboom + Mempennage
     deflection = deflection_angle_by_pointforce(Lh, length, E_modulus_boom, Ixx, Mboom)
     maximum_stress = 1
@@ -80,5 +80,5 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     print(maximum_stress)
     return(M)
 
-finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "circular")
 print(finalmass)

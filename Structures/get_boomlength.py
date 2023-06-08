@@ -39,7 +39,7 @@ def get_Lh_Sh(L, xdif):
     Sh = .98575/lh
     return(Lh, Sh)
 
-def boom_weight(Sh, t_skin, rho):
+def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 

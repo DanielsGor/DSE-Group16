@@ -93,9 +93,9 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
 
 
 lengthrange = np.arange(0, 2, .1)
-tskinrange = np.arange(.0001, .001, .0001)
-thicknessVrange = np.arange(.0001, .001, .0001)
-thicknessHrange = np.arange(.0001, .001, .0001)
+tskinrange = np.arange(.0005, .001, .0001)
+thicknessVrange = np.arange(.0005, .001, .0001)
+thicknessHrange = np.arange(.0005, .001, .0001)
 widthrange = np.arange(.01, .10, .01)
 heightrange = np.arange(.01, .10, .01)
 typ = ['rectangular', 'circular']
@@ -111,22 +111,24 @@ for i in lengthrange:
                 for m in widthrange:
                     for n in heightrange:
                         for o in typ:
-                            M, s, d = finalmass(i, .0222, j, 100, k, l, 100, m, n, x, o)
-                            mat_strength = 275*10**6
-                            if M < optimal_config['mass'] and s < mat_strength and d < 0.5:
-                                optimal_config['length'] = i
-                                optimal_config['skin thickness'] = j
-                                optimal_config['vertical boom thickness'] = k
-                                optimal_config['horizontal boom thickness'] = l
-                                optimal_config['width'] = m
-                                optimal_config['height'] = n
-                                optimal_config['type'] = o
-                                optimal_config['mass'] = M
-                                optimal_config['stress'] = s
-                                optimal_config['deflection'] = d
-                                print(optimal_config)
-                                print('------------------------------------')
+                            for p in ['aluminum 2024-T3']:
+                                r, E, st, sc = material_properties(p)
+                                M, s, d = finalmass(i, .0222, j, 104, k, l, r, m, n, E, o)
+                                if M < optimal_config['mass'] and s < sc and d < 0.5:
+                                    optimal_config['length'] = i
+                                    optimal_config['skin thickness'] = j
+                                    optimal_config['vertical boom thickness'] = k
+                                    optimal_config['horizontal boom thickness'] = l
+                                    optimal_config['width'] = m
+                                    optimal_config['height'] = n
+                                    optimal_config['type'] = o
+                                    optimal_config['mass'] = M
+                                    optimal_config['stress'] = s
+                                    optimal_config['deflection'] = d
+                                    optimal_config['material'] = p
+                                    print(optimal_config)
+                                    print('------------------------------------')
 
-                            else:
-                                continue
+                                else:
+                                    continue
 

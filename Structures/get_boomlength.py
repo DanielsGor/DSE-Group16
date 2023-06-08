@@ -39,7 +39,7 @@ def circular_boom_weight(type, thicknessV, thicknessH, rho, length, width, heigh
 
 def deflection_angle_by_pointforce(force, length, E_modulus, Ix, weightperdistance):
     deflection = ((force*length**2)/(2*E_modulus*Ix)+(weightperdistance*length**2)/(6*E_modulus*Ix))*(180/np.pi)
-
+    return(deflection) #degrees
 def get_Lh_Sh(L, xdif):
     lh = xdif+L
     Lh = 10.93/lh
@@ -50,4 +50,6 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-
+def finalmass():
+    M = Mboom + Mepmpennage
+    Mboom =

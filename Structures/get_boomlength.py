@@ -34,12 +34,6 @@ def BendingStress(Mx, My, Ixx, Iyy, type, width, height):
     return(max_stress, max_stress_loc)
 
 
-
-def inertia_thin_walled_circular_section(thickness, diameter)
-    Ix = (np.pi * thickness * diameter ** 2) / 8
-    J = (np.pi * thickness * diameter ** 2) / 4
-    return(Ix, J)
-
 def boom_properties(type, thicknessV, thicknessH, rho, length, width, height):
     Ixx = None
     Iyy = None
@@ -69,16 +63,18 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom):
+def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom, type):
     Lh, Sh = get_Lh_Sh(length, xdif)
     Mempennage = emp_weight(Sh, tskin, rho_tail)
     Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
     M = Mboom + Mempennage
-    deflection = deflection_angle_by_pointforce(force, length, E_modulus_boom, Ix, Mboom)
-    maximum_stress =
+    F = Lh - Mempennage * 9.81
+    deflection = deflection_angle_by_pointforce(F, length, E_modulus_boom, Ixx, Mboom)
+    My = F * length
+    maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
     print(deflection)
     print(maximum_stress)
-    return(finalmass)
+    return(M)
 
-finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "circular")
 print(finalmass)

@@ -1,0 +1,22 @@
+import numpy as np
+
+alpha_root_local= 4
+alpha_cl0 = 0
+c_r_local = 1
+
+b_w2 = 1
+
+c_p = 1
+
+L_total_req = 0
+L_plasma = 0
+
+rho = 1.225
+cl_alpha_w = 0.1
+
+V = 15
+
+
+twist_rate = ((alpha_root_local-alpha_cl0)*c_r_local*b_w2 + (c_p-c_r_local)*b_w2 / 2 * (alpha_root_local-alpha_cl0) - (L_total_req - L_plasma)/(cl_alpha_w * rho * V**2))/(c_r_local * b_w2**2 / 2 + (c_p -c_r_local) * b_w2**2 / 3)
+
+print(twist_rate)

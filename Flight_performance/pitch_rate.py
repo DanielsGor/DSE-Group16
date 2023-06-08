@@ -25,6 +25,8 @@ cd_cruise = cD0 + cl_cruise**2/(np.pi * A *e)
 
 T_climb = m*g*np.sin(np.deg2rad(climb_angle)) + cd_cruise * S * 0.5 * V**2 * rho
 
+V = np.sqrt(m*g*np.cos(glide_angle)/S * 2/rho * 1/cl_cruise)
+
 x = [0]
 y = [0]
 global_pitch_angles = [glide_angle]
@@ -37,11 +39,18 @@ accs  =[0]
 counter = 0
 
 
+def pitch_dot2 (dt,pitch):
+    dot2 = []
+    for idx,value in enumerate(pitch[0:-3]):
+        dot2.append((pitch[idx + 2] - 2 * pitch[idx + 1] + pitch[idx]) /dt**2)
+    return dot2
+
 while global_pitch_angle > np.deg2rad(-climb_angle):
     time = times[-1] + dt
     global_pitch_angle = global_pitch_angles[-1]
     V = Vs[-1]
     a_tangential = (T_climb + m*g * np.sin(global_pitch_angle) - cd_cruise * 0.5 * rho * V**2 * S) / m
+    V += a_tangential * dt
     a_centripetal = cl_cruise * 0.5 * rho * V**2 * S/m - g * np.cos(global_pitch_angle)
     R = V**2 / a_centripetal
     Rs.append(R)
@@ -51,8 +60,6 @@ while global_pitch_angle > np.deg2rad(-climb_angle):
 
     x_n = x[-1] + R * np.sin(global_pitch_angle) - R * np.sin(global_pitch_angle - d_circle_angle)
     y_n = y[-1] + R * np.cos(global_pitch_angle) - R * np.cos(global_pitch_angle - d_circle_angle)
-
-    V += a_tangential * dt
 
     x.append(x_n)
     y.append(y_n)
@@ -74,9 +81,14 @@ ns = Ls/Ws
 # plt.show()
 
 
-# plt.plot(times, pitch_rates)
-# plt.show()
+plt.plot(times[:-3],pitch_dot2(dt,global_pitch_angles))
+plt.show()
 
+plt.plot(times,pitch_rates)
+plt.show()
+
+plt.plot (x,y)
+plt.show()
 # plt.plot (x, y)
 # plt.show()
 
@@ -85,4 +97,7 @@ print("Vmax is:", max(Vs), "m/s")
 print("The limiting pitch rate is: ", max(pitch_rates)*180/np.pi, " deg/s")
 print("The limiting load factor is: ", max(ns))
 
+print(a_tangential, a_centripetal)
 
+print((pitch_rates[1]-pitch_rates[0])/dt)
+print(min(pitch_dot2(dt,global_pitch_angles)))

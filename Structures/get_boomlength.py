@@ -49,8 +49,8 @@ def boom_properties(type, thicknessV, thicknessH, rho, length, width, height):
     return(mass, Ixx, Iyy)
 
 
-def deflection_angle_by_pointforce(force, length, E_modulus, Ix, massperlength):
-    deflection = ((force*length**2)/(2*E_modulus*Ix)+(massperlength*length**3)/(6*E_modulus*Ix))*180/np.pi
+def deflection_angle_by_pointforce(force, length, E_modulus, Ix, Mboom):
+    deflection = ((force*length**2)/(2*E_modulus*Ix)+(Mboom/length*length**3)/(6*E_modulus*Ix))*180/np.pi
     return(deflection)
 
 def get_Lh_Sh(L, xdif):
@@ -63,10 +63,16 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height):
+def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom):
     Lh, Sh = get_Lh_Sh(length, xdif)
     Mempennage = emp_weight(Sh, tskin, rho_tail)
     Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
     M = Mboom + Mempennage
-    return(M)
+    deflection = deflection_angle_by_pointforce(force, length, E_modulus_boom, Ix, Mboom)
+    maximum_stress =
+    print(deflection)
+    print(maximum_stress)
+    return(finalmass)
 
+finalmass = finalmass(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+print(finalmass)

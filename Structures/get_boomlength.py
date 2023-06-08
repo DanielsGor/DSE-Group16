@@ -62,4 +62,6 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-
+def finalmass():
+    M = Mboom + Mepmpennage
+    Mboom =

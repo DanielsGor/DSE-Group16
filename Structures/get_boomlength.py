@@ -68,8 +68,9 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     Mempennage = emp_weight(Sh, tskin, rho_tail)
     Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
     M = Mboom + Mempennage
-    deflection = deflection_angle_by_pointforce(Lh, length, E_modulus_boom, Ixx, Mboom)
-    My = Lh * length
+    F = Lh - Mempennage * 9.81
+    deflection = deflection_angle_by_pointforce(F, length, E_modulus_boom, Ixx, Mboom)
+    My = F * length
     maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
     print(deflection)
     print(maximum_stress)

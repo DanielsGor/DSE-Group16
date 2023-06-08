@@ -49,8 +49,9 @@ def boom_properties(type, thicknessV, thicknessH, rho, length, width, height):
     return(mass, Ixx, Iyy)
 
 
-def deflection_angle_by_pointforce(force, length, E_modulus, Ix):
-    d
+def deflection_angle_by_pointforce(force, length, E_modulus, Ix, massperlength):
+    deflection = ((force*length**2)/(2*E_modulus*Ix)+(massperlength*length**3)/(6*E_modulus*Ix))*180/np.pi
+    return(deflection)
 
 def get_Lh_Sh(L, xdif):
     lh = xdif+L
@@ -62,6 +63,10 @@ def emp_weight(Sh, t_skin, rho):
     Wemp = 8*Sh*t_skin*rho
     return(Wemp)
 
-def finalmass():
-    M = Mboom + Mepmpennage
-    Mboom =
+def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height):
+    Lh, Sh = get_Lh_Sh(length, xdif)
+    Mempennage = emp_weight(Sh, tskin, rho_tail)
+    Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
+    M = Mboom + Mempennage
+    return(M)
+

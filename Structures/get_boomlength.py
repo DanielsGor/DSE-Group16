@@ -54,11 +54,21 @@ def deflection_angle_by_pointforce(force, length, E_modulus, Ix, Mboom):
     return(deflection)
 
 def material_properties(mat):
-    if mat == 'balsa'
-        rho =
-    elif mat == 'aluminum'
-        rho =
-    return ()
+    rho = None
+    E_modulus_tensile = None
+    sigma_y_tensile = None
+    sigma_y_compressive = None
+    if mat == 'balsa':
+        rho = 104
+        E_modulus_tensile = 2.239*10**9
+        sigma_y_tensile =  7.501*10*6
+        sigma_y_compressive = 6.523*10**6
+    elif mat == 'aluminum 2024-T3':
+        rho = 2780
+        E_modulus_tensile = 73.1*10**9
+        sigma_y_tensile = 275*10**6
+        sigma_y_compressive = 275*10**6
+    return(rho, E_modulus_tensile, sigma_y_tensile, sigma_y_compressive)
 
 def get_Lh_Sh(L, xdif):
     lh = xdif+L
@@ -101,7 +111,7 @@ for i in lengthrange:
                 for m in widthrange:
                     for n in heightrange:
                         for o in typ:
-                            M, s, d = finalmass(i, .0222, j, 100, k, l, 100, m, n, 2037*10**6, o)
+                            M, s, d = finalmass(i, .0222, j, 100, k, l, 100, m, n, x, o)
                             mat_strength = 275*10**6
                             if M < optimal_config['mass'] and s < mat_strength and d < 0.5:
                                 optimal_config['length'] = i

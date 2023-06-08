@@ -11,15 +11,16 @@ V_pp_short = [0, 9, 12]
 V_pp_long = [0, 6, 9, 12]
 
 
-V_pp_short = [12]
-V_pp_long = [12]
+V_pp_short = [0, 12]
+V_pp_long = [0, 12]
 
 
 f_burst_short = [10, 50, 200]
-f_burst_long = [10, 20, 50, 100, 200, 500]
+f_burst_long = [2, 5, 10, 20, 50, 100] #500 is unrealistic
+# remove the 200, 500 by more in between values or removing them
 
-duty_cycle_short = [0.1, 0.5, 0.9]
-duty_cycle_long = [0.1, 0.3, 0.5, 0.7, 0.9]
+duty_cycle_short = [0.1, 0.5, 1]
+duty_cycle_long = [0.1, 0.3, 0.5, 0.7, 1]
 
 
 
@@ -69,6 +70,8 @@ def combined_test(test_1=test_1(), test_2=test_2(), test_3=test_3(), test_4=test
     # Remove duplicates from df_combined
     df_combined = df_combined.drop_duplicates(subset=['alpha', 'V_pp', 'f_burst', 'duty_cycle'])
     # get rid of duplicates when V_pp = 0
+    df_combined = df_combined[~((df_combined['V_pp'] == 0) & (df_combined.duplicated(subset=['alpha'], keep='first')))]
+
 
     '''
     Input code to remove duplicates when V_pp = 0
@@ -77,7 +80,7 @@ def combined_test(test_1=test_1(), test_2=test_2(), test_3=test_3(), test_4=test
     df_combined = df_combined.reset_index(drop=True)
 
     # Given that every test takes 3 minutes, how long will it take to run all tests?
-    time_per_test = 2 # minutes
+    time_per_test = 1 # minutes
     print('Number of tests: ', len(df_combined))
     print('Time to run all tests: ', len(df_combined)*time_per_test/60, ' hours')
     print('break')

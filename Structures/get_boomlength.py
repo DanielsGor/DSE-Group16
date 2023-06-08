@@ -72,7 +72,7 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     deflection = deflection_angle_by_pointforce(F, length, E_modulus_boom, Ixx, Mboom)
     My = F * length
     maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
-    return(M)
+    return(M, maximum_stress, deflection)
 
 
 lengthrange = np.arange(0, 2, .1)
@@ -83,16 +83,33 @@ widthrange = np.arange(.01, .10, .01)
 heightrange = np.arange(.01, .10, .01)
 typ = ['rectangular', 'circular']
 
-Masses = []
+optimal_config = {'length': None, 'skin thickness': None, 'vertical boom thickness': None,
+                  'horizontal boom thickness': None, 'width': None, 'height': None,
+                  'type': None, 'material': None, 'mass': float('inf')}
+
 for i in lengthrange:
     for j in tskinrange:
-        for k in thicknessHrange:
+        for k in thicknessVrange:
             for l in thicknessHrange:
                 for m in widthrange:
                     for n in heightrange:
                         for o in typ:
+                            M, s, d = finalmass(i, .0222, j, 100, k, l, 100, m, n, 2037*10**6, o)
+                            mat_strength = 275*10**6
+                            if M < optimal_config['mass'] and s < mat_strength and d < 0.5:
+                                optimal_config['length'] = i
+                                optimal_config['skin thickness'] = j
+                                optimal_config['vertical boom thickness'] = k
+                                optimal_config['horizontal boom thickness'] = l
+                                optimal_config['width'] = m
+                                optimal_config['height'] = n
+                                optimal_config['type'] = o
+                                optimal_config['mass'] = M
+                                optimal_config['stress'] = s
+                                optimal_config['deflection'] = d
+                                print(optimal_config)
+                                print('------------------------------------')
 
-                            set.append(ijk)
-                            Masses.append(finalmass(i, .0222, j, 100, k, l, 100, m, n, 2037*10**6, o))
+                            else:
+                                continue
 
-print(finalmass)

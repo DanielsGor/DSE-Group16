@@ -72,8 +72,6 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     deflection = deflection_angle_by_pointforce(F, length, E_modulus_boom, Ixx, Mboom)
     My = F * length
     maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
-    print(deflection)
-    print(maximum_stress)
     return(M)
 
 
@@ -83,10 +81,18 @@ thicknessVrange = np.arange(.0001, .001, .0001)
 thicknessHrange = np.arange(.0001, .001, .0001)
 widthrange = np.arange(.01, .10, .01)
 heightrange = np.arange(.01, .10, .01)
+typ = ['rectangular', 'circular']
 
 Masses = []
 for i in lengthrange:
-    finalmass = finalmass(i, 1, 1, 1, 1, 1, 1, 1, 1, 1, "circular")
+    for j in tskinrange:
+        for k in thicknessHrange:
+            for l in thicknessHrange:
+                for m in widthrange:
+                    for n in heightrange:
+                        for o in typ:
 
+                            set.append(ijk)
+                            Masses.append(finalmass(i, .0222, j, 100, k, l, 100, m, n, 2037*10**6, o))
 
 print(finalmass)

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import itertools
-from sample_data_setup import create_dummy_data
+from create_sample_data import create_dummy_data
 
 #model data
 S = 0.1 # m^2
@@ -32,11 +32,29 @@ def split_data(df):
     return df_1, df_2, df_3, df_4
 
 def plotting(df):
-    #split up into further dataframes
+    #get variables used in test series
     alpha_range = df['alpha'].unique()
     V_pp_range = df['V_pp'].unique()
     f_burst_range = df['f_burst'].unique()
     duty_cycle_range = df['duty_cycle'].unique()
+
+    #find x to plot against
+    longest_length = len(max([alpha_range, V_pp_range, f_burst_range, duty_cycle_range], key=len))
+    x = [lst for lst in [alpha_range, V_pp_range, f_burst_range, duty_cycle_range] if len(lst) == longest_length]
+
+    fig, (ax1, ax2) = plt.subplots(1, 3)
+    fig.suptitle('Cl-alpha, Cd-alpha, Cm-alpha plots')
+
+    #ax1
+    ax1.set_title('Cl-alpha')
+    ax1.plot(x, y)
+    ax1.plot(x, y)
+    ax1.plot(x, y)
+    ax1.plot(x, y)
+    ax1.plot(x, y)
+
+
+    return
 
 
 
@@ -44,6 +62,10 @@ def main():
     df = get_data()
     df = get_coeff(df, S, c, rho, v)
     df_1, df_2, df_3, df_4 = split_data(df)
+    plotting(df_1)
+    plotting(df_2)
+    plotting(df_3)
+    plotting(df_4)
 
 if __name__ == '__main__':
     main()

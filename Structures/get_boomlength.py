@@ -6,24 +6,30 @@ import math
 def BendingStress(Mx, My, Ixx, Iyy, type, width, height):
     #   Neutral axis angle from cg coordinate frame
     tana = np.tan(-(My * Ixx) / (Mx * Iyy))
-
+    x = np.arange(0)
+    y = np.arange(0)
     if type == 'circular':
-        xloc1 = width * np.cos(np.arctan(tana) + np.pi / 2)
-        xloc2 = width * np.cos(np.arctan(tana) - np.pi / 2)
+        x = np.append(x, width * np.cos(np.arctan(tana) + np.pi / 2))
+        x = np.append(x, width * np.cos(np.arctan(tana) - np.pi / 2))
+        y = np.append(y, width * np.sin(np.arctan(tana) + np.pi / 2))
+        y = np.append(y, width * np.sin(np.arctan(tana) - np.pi / 2))
+    elif type == 'rectangular':
+        x = np.append(x, width / 2)
+        x = np.append(x, width / 2)
+        x = np.append(x, -width / 2)
+        x = np.append(x, -width / 2)
+        y = np.append(y, height / 2)
+        y = np.append(y, -height / 2)
+        y = np.append(y, height / 2)
+        y = np.append(y, -height / 2)
 
 
+    stress = np.zeros(len(x))
+    for i in range(len(x)):
+        stress[i] = ((Mx * Iyy) * y[i] + (My * Ixx) * x[i]) / (Ixx * Iyy)
 
-
-    #   Find maximum distance from NA for each span increment
-    na_dist = np.abs(tana * xboom - yboom) / np.sqrt(tana ** 2 + 1)
-    max_dist_i = np.argmax(na_dist)
-
-    #   Stress calculation
-    max_stress = ((Mx * Iyy) * yboom[max_dist_i] + (My * Ixx) *
-                     xboom[max_dist_i]) / (Ixx * Iyy)
-
-    #   Assign maximum stress location values
-    max_stress_loc = [np.array(xboom[max_dist_i]), np.array(yboom[max_dist_i])]
+    max_stress = np.amax(stress)
+    max_stress_loc = np.array([x[np.argmax(stress)], y[np.argmax(stress)]])
 
     return(max_stress, max_stress_loc)
 

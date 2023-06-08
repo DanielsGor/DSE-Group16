@@ -27,9 +27,15 @@ def inertia_thin_walled_circular_section(thickness, diameter)
     Ix = (np.pi * thickness * diameter ** 2) / 8
     J = (np.pi * thickness * diameter ** 2) / 4
     return(Ix, J)
-def get_mass(thickness, diameter, rho, length):
-    mass = np.pi*diameter*thickness*rho*length
+
+def circular_boom_weight(type, thicknessV, thicknessH, rho, length, width, height):
+    if type == 'circular':
+        mass = np.pi*width*thicknessV*rho*length
+    elif type == 'rectangular':
+        mass = (2*width*thicknessH+2*height*thicknessV)*length*rho
     return(mass)
+
+
 def deflection_angle_by_pointforce(force, length, E_modulus, Ix):
     d
 

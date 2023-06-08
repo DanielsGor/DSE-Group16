@@ -34,12 +34,6 @@ def BendingStress(Mx, My, Ixx, Iyy, type, width, height):
     return(max_stress, max_stress_loc)
 
 
-
-def inertia_thin_walled_circular_section(thickness, diameter)
-    Ix = (np.pi * thickness * diameter ** 2) / 8
-    J = (np.pi * thickness * diameter ** 2) / 4
-    return(Ix, J)
-
 def boom_properties(type, thicknessV, thicknessH, rho, length, width, height):
     Ixx = None
     Iyy = None
@@ -75,7 +69,8 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
     M = Mboom + Mempennage
     deflection = deflection_angle_by_pointforce(force, length, E_modulus_boom, Ix, Mboom)
-    maximum_stress =
+    My = Lh * length
+    maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
     print(deflection)
     print(maximum_stress)
     return(finalmass)

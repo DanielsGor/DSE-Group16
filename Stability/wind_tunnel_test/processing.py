@@ -2,11 +2,10 @@ import numpy as np
 import pandas as pd
 import itertools
 import matplotlib.pyplot as plt
-from preprocessing import calc_aero_forces
+from preprocessing import calc_aero_forces, get_test_matrix
 
 
-def combine_data(data):
-    test_matrix = pd.read_excel('Stability\\wind_tunnel_test\\wind_tunnel_test_matrix.xlsx')
+def combine_data(data, test_matrix):
 
     df = pd.concat([test_matrix, data], axis=1)
     return df
@@ -89,7 +88,7 @@ def plotting(df):
 
 
 def main():
-    df = combine_data()
+    df = combine_data(data, test_matrix)
     df = get_coeff(df, S, c, rho, v)
     df_1, df_2, df_3, df_4 = split_data(df)
     plotting(df_4)

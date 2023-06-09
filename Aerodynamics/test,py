@@ -1,0 +1,45 @@
+import numpy as np
+
+print ((-2**2)**0.5)
+root_angles = np.arange(-2,8,1)
+root_chords = np.arange(0.2,1.1,0.1)
+twist_rates = np.arange(-10,10.2,0.4)
+
+results = np.empty((len(root_angles)*len(root_chords)*len(twist_rates),3))
+counter = 0
+for idx1,i in enumerate(root_angles):
+    for idx2,j in enumerate(root_chords):
+        for idx3,k in enumerate(twist_rates):
+            results [counter] = [i,j,k]
+            counter += 1
+
+print('hi')
+# lst1 = [[3,2],[3,4],[1,6]]
+# lst = np.array(lst1)
+
+# min = np.amin(lst[:,0])
+# val =np.where(lst[:, 0] == min)
+
+# # print (val[0][0])
+
+# alpha_root_local= 4
+# alpha_cl0 = 0
+# c_r_local = 1
+
+# b_w2 = 1
+
+# c_p = 1
+
+# L_total_req = 0
+# L_plasma = 0
+
+# rho = 1.225
+# cl_alpha_w = 0.1
+
+# V = 15
+
+# twistdot = 8
+
+# twist_rate2 = ((alpha_root_local - alpha_cl0)*b_w2 + b_w2**2/2 * (c_p-c_r_local)/b_w2 * (alpha_root_local-alpha_cl0) - b_w2**2/2 * twistdot - b_w2 ** 3 /3 * twistdot * (c_p - c_r_local)/b_w2 - (L_total_req  -L_plasma)/ (rho * V**2 * cl_alpha_w))/ (c_r_local*b_w2**3/3 + b_w2/4 * (c_p - c_r_local)/b_w2)
+
+# print(twist_rate2)

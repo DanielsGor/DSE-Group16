@@ -1,0 +1,51 @@
+% Description: First draft (David-Thomas) code for loading the raw data
+% files from the 50N balance (Ming). Initial post-processing steps applied
+% as well
+
+
+%% Inset airfoil specific data
+S = 0.201*0.4;  % Surface area model
+ws = 12.2;      % Flow velocity
+aoa = 20;       % Angle of attack
+
+%% Load the datafile 
+% Convert the load data
+file_folder = "F:\HighLiftWingTest\TestData\060623"; % full path to folder of file 
+file_name = "M_11_setup5_aoa_"+aoa+"_U_"+round(ws)+"_060623.tdms"; % file name (should end in .tdms) 
+force_file = fullfile(file_folder,file_name); % combined for the full file name
+% Read TDMS file (using function attached)
+[ConvertedData,ConvertVer,ChanNames]=convertTDMS(false,force_file);
+rotor.time = ConvertedData.Data.MeasuredData(3).Data; % time column
+rotor.ch1 = ConvertedData.Data.MeasuredData(4).Data; % Ch1 force (Lift 1)
+rotor.ch2 = ConvertedData.Data.MeasuredData(5).Data; % Ch2 force (Lift 2) 
+rotor.ch3 = ConvertedData.Data.MeasuredData(6).Data; % Ch3 force (Lift 3)
+
+%% Processing of the data 
+% Process data
+channel1 = rotor.ch1;%-noise_wind_ch1; % Here I took noise measurments but we can zero the balance instead 
+channel2 = rotor.ch2;%-noise_wind_ch2;
+channel3 = rotor.ch3;%-noise_wind_ch3;
+
+
+total_norm = channel1 + channel2;
+total_ax = channel3;
+
+% Implement If statement for mirroring normal force
+mean_norm = mean(total_norm);
+mean_ax = mean(total_ax);
+
+% get maximum, minimum and standard deviation of normal and axial force
+min_norm = min(total_norm);
+max_norm = max(total_norm);
+std_norm = std(total_norm);
+
+min_ax = min(total_ax);
+max_ax = max(total_ax);
+std_ax = std(total_ax);
+
+% Convert normal and axial force to lift and drag
+mean_lift = mean_norm*cos(deg2rad(aoa)) - mean_ax*sin(deg2rad(aoa));
+mean_drag = mean_norm*sin(deg2rad(aoa)) + mean_ax*cos(deg2rad(aoa));
+% Compute cl and cd
+mean_cl = mean_lift/((1/2)*1.225*(ws^2)*(S));
+mean_cd = mean_drag/((1/2)*1.225*(ws^2)*(S));

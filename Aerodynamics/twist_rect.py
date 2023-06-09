@@ -28,16 +28,16 @@ alpha_cl0 = -6
 #Iteration calculations
 n_discretisations = 1000 #m
 
-def calculate_lift_distribution (alpha_root_local, c_r_local,twist_dot):
+def calculate_lift_distribution (alpha_root_local, c_r_local, b_s_local):
 
     #main lifting wing
     L_total_req = m*g
     L_plasma = cl_p * rho * V**2 * S_p2 #1/2 is taken out since its factored out in the twist rate calculation
-    twist_dot2 = ((alpha_root_local - alpha_cl0)*b_w2 + b_w2**2/2 * (c_p-c_r_local)/b_w2 * (alpha_root_local-alpha_cl0) - b_w2**2/2 * twist_dot - b_w2 ** 3 /3 * twist_dot * (c_p - c_r_local)/b_w2 - (L_total_req  -L_plasma)/ (rho * V**2 * cl_alpha_w))/ (c_r_local*b_w2**3/3 + b_w2/4 * (c_p - c_r_local)/b_w2)
-    
+    twist_rate = (c_r_local * (alpha_root_local-alpha_cl0) * b_w2 + (alpha_root_local-alpha_cl0)*(c_p-c_r_local)/(b_w2-b_s_local) * (b_w2**2 -b_s_local**2)/2 - (L_total_req-L_plasma)/ (rho * V**2 * cl_alpha_w))/(c_r_local*b_w2**2/2 + (c_p-c_r_local)/(b_w2-b_s) * (b_w2**3 -b_s_local**3)/3)
     
     n_w = n_discretisations * np.ceil(b_w2/b2 * 100)/100
     dyi_w = b_w2/n_w #added n_discretisations
+    dyi_s = b_s_local/n_w #added n_discretisations
 
     cs = []
     angles = []
@@ -46,18 +46,19 @@ def calculate_lift_distribution (alpha_root_local, c_r_local,twist_dot):
     diffs = []
     ideals = []
     cls = []
-    for yi in np.linspace(0,b_w2, int(np.ceil(b_w2/b2 * n_discretisations))):    
-        c_yi =  (c_p -c_r_local)*(yi/b_w2) + c_r_local
-        S_yi = c_yi * dyi_w
+    
+    for yi in np.linspace(0,b_s_local, int(np.ceil(b_s_local/b2 * n_discretisations))):    
+        c_yi =  c_r_local
+        S_yi = c_yi * dyi_s
 
-        alpha_yi = alpha_root_local - yi*twist_dot - yi**2 * twist_dot2
+        alpha_yi = alpha_root_local - yi*twist_rate
         if np.abs (alpha_yi) > 15:
             alpha_yi = 0
-
+        
         correctional_factor_for_lift = -6.566*yi**6 + 27.609*yi**5 -44.472*yi**4 + 34.027*yi**3 - 12.528*yi**2 + 1.9309*yi -0.0835  #numbers from xflr5 comparing 2d to 3d case of straight wing
         cl_yi = (alpha_yi - alpha_cl0)*cl_alpha_w * (1+correctional_factor_for_lift)
 
-        local_param = cl_yi* 1/2 *rho * V**2 * c_yi 
+        local_param = cl_yi* 1/2 *rho * V**2 * c_yi
         local_ideal = gamma0 * rho * V* np.sqrt(1-(2*yi/b_total)**2)
         
         cls.append(S_yi)
@@ -67,17 +68,37 @@ def calculate_lift_distribution (alpha_root_local, c_r_local,twist_dot):
         ideals.append(local_ideal)
         cs.append(c_yi)
         angles.append(alpha_yi)
-    n_p = n_discretisations - n_w
+
+    for yi in np.linspace(b_s_local,b_w2, int(np.ceil((b_w2-b_s_local)/b2 * n_discretisations))):    
+        c_yi =  (c_p -c_r_local)*((yi-b_s)/(b_w2-b_s)) + c_r_local
+        S_yi = c_yi * dyi_w
+
+        alpha_yi = alpha_root_local - yi*twist_rate
+        if np.abs (alpha_yi) > 15:
+            alpha_yi = 0
+        
+        correctional_factor_for_lift = -6.566*yi**6 + 27.609*yi**5 -44.472*yi**4 + 34.027*yi**3 - 12.528*yi**2 + 1.9309*yi -0.0835  #numbers from xflr5 comparing 2d to 3d case of straight wing
+        cl_yi = (alpha_yi - alpha_cl0)*cl_alpha_w * (1+correctional_factor_for_lift)
+
+        local_param = cl_yi* 1/2 *rho * V**2 * c_yi
+        local_ideal = gamma0 * rho * V* np.sqrt(1-(2*yi/b_total)**2)
+        
+        cls.append(S_yi)
+        diffs.append((local_param-local_ideal)**2)
+        lifts.append(local_param)
+        ys.append(yi)
+        ideals.append(local_ideal)
+        cs.append(c_yi)
+        angles.append(alpha_yi)
+    n_p = n_discretisations - n_w 
     dyi_p = b_p2 / n_p #added n_discretisations
 
-
     #control wing
-    for yi in np.linspace (b_w2,b_w2+b_p2,n_discretisations-int(np.ceil(b_w2/b2 * n_discretisations))):
+    for yi in np.linspace (b_w2,b_w2+b_p2,n_discretisations-int(np.ceil(b_s_local/b2 * n_discretisations))-int(np.ceil((b_w2-b_s_local)/b2 * n_discretisations))):
         cl_yi = cl_p
         c_yi = c_p
         alpha_yi = 8 #deg 
         S_yi = dyi_p * c_yi
-
         correctional_factor_for_lift = -6.566*yi**6 + 27.609*yi**5 -44.472*yi**4 + 34.027*yi**3 - 12.528*yi**2 + 1.9309*yi -0.0835  #numbers from xflr5 comparing 2d to 3d case of straight wing
         local_param = cl_yi* 1/2 *rho * V**2 * c_yi * (1+correctional_factor_for_lift)
         local_ideal = gamma0 * rho * V* np.sqrt(1-(2*yi/b_total)**2) 
@@ -91,36 +112,40 @@ def calculate_lift_distribution (alpha_root_local, c_r_local,twist_dot):
         angles.append(alpha_yi)
 
     total_diff = sum(diffs,0)
-    return total_diff, lifts, ideals, cs, angles, cls, ys, twist_dot2
+    return total_diff, lifts, ideals, cs, angles, cls, ys, twist_rate
 
-### iteration ###
 
 d_alpha_root = 1
-d_cr = 0.2
-d_twist_rate = 0.2
+d_cr = 0.1
+d_b_s = 0.1
 
-root_angles = np.arange(-6,-4+d_alpha_root,d_alpha_root)
-root_chords = np.arange(0.8,1.1 + d_cr,d_cr)
-twist_rates = np.arange(-5,2 + d_twist_rate,d_twist_rate)
+root_angles = np.arange(3,9+d_alpha_root,d_alpha_root)
+root_chords = np.arange(0.2,0.6 + d_cr,d_cr)
+b_ss = np.arange(0.5,1.3 + d_b_s, d_b_s)
 
-
-def optimisation (c_r, alpha_root, twist_rate):
+def optimisation (c_r, alpha_root, b_s):
     optimised = False
     i,j,k,counter = 0,0,0,0
     while optimised == False and np.abs(i) <= 2 and np.abs(j) <= 2 and np.abs(k) <= 2 and counter <= 10:
         
-        current_diff = calculate_lift_distribution(alpha_root, c_r, twist_rate)[0]
-        diff_cr_up = calculate_lift_distribution(alpha_root, c_r + d_cr/2, twist_rate)[0]
-        if c_r - d_cr < c_p:
+        current_diff = calculate_lift_distribution(alpha_root, c_r, b_s)[0]
+        diff_cr_up = calculate_lift_distribution(alpha_root, c_r + d_cr/2, b_s)[0]
+        if c_r - d_cr/2 < c_p:
             diff_cr_down = current_diff
         else:
-            diff_cr_down = calculate_lift_distribution(alpha_root, c_r - d_cr/2, twist_rate)[0]
-        diff_alpha_up = calculate_lift_distribution(alpha_root+d_alpha_root/2, c_r, twist_rate)[0]
-        diff_alpha_down = calculate_lift_distribution(alpha_root - d_alpha_root/2, c_r, twist_rate)[0]
-        diff_twist_rate_up = calculate_lift_distribution(alpha_root, c_r, twist_rate + d_twist_rate/2)[0]
-        diff_twist_rate_down =  calculate_lift_distribution(alpha_root, c_r, twist_rate - d_twist_rate/2)[0]
+            diff_cr_down = calculate_lift_distribution(alpha_root, c_r - d_cr/2, b_s)[0]
+        diff_alpha_up = calculate_lift_distribution(alpha_root+d_alpha_root/2, c_r, b_s)[0]
+        diff_alpha_down = calculate_lift_distribution(alpha_root - d_alpha_root/2, c_r, b_s)[0]
+        if b_s + d_b_s/2 < b_w2:
+            diff_b_s_up = calculate_lift_distribution(alpha_root, c_r, b_s + d_b_s/2)[0]
+        else: 
+            diff_b_s_up = current_diff
+        if b_s - d_b_s/2 > 0:
+            diff_b_s_down =  calculate_lift_distribution(alpha_root, c_r, b_s - d_b_s/2)[0]
+        else:
+            diff_b_s_down = current_diff
 
-        differences = [current_diff, diff_cr_up, diff_cr_down, diff_alpha_up, diff_alpha_down, diff_twist_rate_up, diff_twist_rate_down]
+        differences = [current_diff, diff_cr_up, diff_cr_down, diff_alpha_up, diff_alpha_down, diff_b_s_up,diff_b_s_down]
         index = differences.index(min(differences))
         if index == 0:
             optimised = True
@@ -137,22 +162,22 @@ def optimisation (c_r, alpha_root, twist_rate):
             alpha_root -= d_alpha_root
             j -= 1
         elif index == 5:
-            twist_rate += d_twist_rate
+            b_s += d_b_s
             k += 1
         else:
-            twist_rate -= d_twist_rate
+            b_s -= d_b_s
             k -= 1
         counter += 1
 
-    return [current_diff, c_r, alpha_root, twist_rate]
+    return [current_diff, c_r, alpha_root, b_s]
 
 results = [] #np.empty((len(root_angles)*len(root_chords)*len(twist_rates),4))
 
 for root_angle in root_angles:
     for root_chord in root_chords:
-        for twist_rate in twist_rates:
-            results.append(optimisation(root_chord, root_angle, twist_rate))
-        print (root_angle, root_chord, twist_rate)
+        for b_s in b_ss:
+            results.append(optimisation(root_chord, root_angle, b_s))
+        print (root_angle, root_chord, b_s)
     
 
 results_arr = np.array(results)
@@ -160,10 +185,10 @@ min_diff = np.amin(results_arr[:,0])
 
 index = np.where(results_arr[:, 0] == min_diff)[0][0]
 
-c_r, alpha_root, twist_rate = results_arr[index][1], results_arr[index][2], results_arr[index][3]
-print ('completing final results', c_r, alpha_root, twist_rate)
+c_r, alpha_root, b_s = results_arr[index][1], results_arr[index][2], results_arr[index][3]
+print ('completing final results', c_r, alpha_root, b_s)
 
-diffs, lifts, ideals, cs, angles, cls, ys, twist_rate2 = calculate_lift_distribution(alpha_root_local=alpha_root, c_r_local=c_r,twist_dot=twist_rate)
+diffs, lifts, ideals, cs, angles, cls, ys, twist_rate = calculate_lift_distribution(alpha_root_local=alpha_root, c_r_local=c_r,b_s_local = b_s)
 
 plt.plot(ys, lifts, label = 'real')
 plt.plot(ys, ideals, label = 'ideal')
@@ -182,4 +207,4 @@ plt.legend()
 plt.show()
 
 
-print (c_r, alpha_root, twist_rate, twist_rate2)
+print (c_r, alpha_root, b_s, twist_rate)

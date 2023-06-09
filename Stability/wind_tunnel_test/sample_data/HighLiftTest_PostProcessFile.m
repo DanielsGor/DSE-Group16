@@ -3,25 +3,60 @@
 % as well
 
 
-% MATLAB script (modified)
-function [mean_norm, mean_ax] = my_script(input_file)
-    % Read TDMS file
-    [ConvertedData, ~, ~] = convertTDMS(false, input_file);
-    rotor.ch1 = ConvertedData.Data.MeasuredData(4).Data; % Ch1 force (Lift 1)
-    rotor.ch2 = ConvertedData.Data.MeasuredData(5).Data; % Ch2 force (Lift 2)
-    rotor.ch3 = ConvertedData.Data.MeasuredData(6).Data; % Ch3 force (Lift 3)
+function HighLiftTest_PostProcessFile()
+    % Call the HighLiftTest_PostProcessFile function with the directory path as an argument
+    directory = 'C:\Users\louis\PycharmProjects\SVV\B50\DSE-Group16\Stability\wind_tunnel_test\sample_data\SampleData';
+    run_post_processing(directory);
+end
 
-    % Processing of the data
-    channel1 = rotor.ch1;
-    channel2 = rotor.ch2;
-    channel3 = rotor.ch3;
+function run_post_processing(directory)
+    % Get a list of all files in the directory
+    files = dir(fullfile(directory, '*.tdms'));
 
-    total_norm = channel1 + channel2;
-    total_ax = channel3;
+    % Create a cell array to store the results
+    results = cell(numel(files), 3);
+    results{1, 1} = 'File Name';
+    results{1, 2} = 'Mean Norm';
+    results{1, 3} = 'Mean Ax';
 
-    % Calculate mean values
-    mean_norm = mean(total_norm);
-    mean_ax = mean(total_ax);
+    % Process each file
+    for i = 1:numel(files)
+        file = fullfile(directory, files(i).name);
+        [~, file_name, ~] = fileparts(file);
+        
+        % Call the matlab_conversion function
+        [ConvertedData,ConvertVer,ChanNames]=convertTDMS(false,file);
+        rotor.time = ConvertedData.Data.MeasuredData(3).Data; % time column
+        rotor.ch1 = ConvertedData.Data.MeasuredData(4).Data; % Ch1 force (Lift 1)
+        rotor.ch2 = ConvertedData.Data.MeasuredData(5).Data; % Ch2 force (Lift 2) 
+        rotor.ch3 = ConvertedData.Data.MeasuredData(6).Data; % Ch3 force (Lift 3)
+        
+        %% Processing of the data 
+        % Process data
+        channel1 = rotor.ch1;%-noise_wind_ch1; % Here I took noise measurments but we can zero the balance instead 
+        channel2 = rotor.ch2;%-noise_wind_ch2;
+        channel3 = rotor.ch3;%-noise_wind_ch3;
+        
+        
+        total_norm = channel1 + channel2;
+        total_ax = channel3;
+        
+        % Implement If statement for mirroring normal force
+        mean_norm = mean(total_norm);
+        mean_ax = mean(total_ax);
+
+        disp(mean_norm)
+        disp(mean_ax)
+        % Store the results in the cell array
+        results{i+1, 1} = file_name;
+        results{i+1, 2} = mean_norm;
+        results{i+1, 3} = mean_ax;
+    end
+
+    % Save the results to an Excel file
+    output_file = fullfile('C:\Users\louis\PycharmProjects\SVV\B50\DSE-Group16\Stability\wind_tunnel_test\sample_data', 'wind_tunnel_measurement_data.xlsx');
+    writecell(results, output_file);
+    
 end
 
 

@@ -6,7 +6,8 @@ from constants import df
 # Coordinate system: X Upwards and Z forwards
 
 class boomShit:
-    def __init__(self):
+    def __init__(self, df):
+
         self.l_boom = df['l_boom']
         self.d_boom = df['d_boom']
         self.b_boom = df['b_boom']

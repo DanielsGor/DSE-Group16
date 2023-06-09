@@ -2,13 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ### inputs ###
-roll_rate_iter = 1 #deg/s
-droll_rate = 0.1
+roll_rate2_init = 1
+droll_rate2 = 0.1
 accuracy = 0.1
 
 #TODO: Propulsion influence 
 
-def fun(roll_rate):
+def fun(roll_rate2):
     m = 7.68 #kg
     g = 9.81 #m/s2
     V = 15.1 #m/s
@@ -23,10 +23,13 @@ def fun(roll_rate):
     Rs = [0] #m
     global_yaw_angle = 0
     gs = [0] 
+    roll_rates = [0]
     phi = 0
+    roll_rate = 0
     t = 0
     while global_yaw_angle < 2*np.pi*(nTurnsTotal-1) - np.pi/2:
         t += dt
+        roll_rate += roll_rate2 * dt
         phi += roll_rate* dt
         a_centripetal = np.tan(np.deg2rad(phi)) * m * g
         R = V**2/a_centripetal
@@ -44,18 +47,20 @@ def fun(roll_rate):
         Rs.append(R)
         global_yaw_angle += d_circle_angle
         gs.append(global_yaw_angle)
+        roll_rates.append(roll_rate)
     
-    return x, y, phis 
+    return x, y, phis, roll_rates
 
 x = [0]
 
 while np.abs(x[-1] - 25) > accuracy:
-    roll_rate_iter += droll_rate
-    x,y,phis = fun(roll_rate_iter)
+    roll_rate2_init += droll_rate2
+    x,y,phis, roll_rates = fun(roll_rate2_init)
 
 max_load = np.sqrt(np.arctan(max(phis))+1)
 print(max_load, max(phis))
 print (x[-1],y[-1])
 plt.plot (x,y)
 plt.show()
-print (roll_rate_iter)
+print(roll_rate2_init)
+print(np.deg2rad(max(roll_rates)))

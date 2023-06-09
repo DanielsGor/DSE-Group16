@@ -22,6 +22,8 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
     wing_xlocation = fuselage_dimensions['wing_xlocation']
     root_chord = fuselage_dimensions['root_chord']
     fuselage_mass = fuselage_dimensions['mass']
+    fuselage_drag_coefficient = fuselage_dimensions['drag_coefficient']
+    fuselage_lift_coefficient = fuselage_dimensions['lift_coefficient']
     wing_start_location = fuselage_length - wing_xlocation - (root_chord / 2)
     wing_end_location = wing_start_location + root_chord
 
@@ -59,16 +61,19 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
     launch_force = - launcher_energy / track_length
 
     #   Assume that the fuselage drag is that of a cube for conceptual design
-    fuselage_drag = cube_drag_coefficient * 0.5 * rho * cruise_velocity**2 * fuselage_width * fuselage_height
+    fuselage_drag = fuselage_drag_coefficient * 0.5 * rho * cruise_velocity**2 * fuselage_length
     fuselage_drag_distribution = fuselage_drag * np.ones(n_increments)
+
+    fuselage_lift = fuselage_lift_coefficient * 0.5 * rho * cruise_velocity**2 * fuselage_length
+    fuselage_lift_distribution = - (fuselage_lift / fuselage_length) * np.ones(n_increments)
 
     wing_drag_distribution = np.append(np.zeros(n_wing_start), wing_drag * np.ones(n_increments - n_wing_start))
 
     propeller_thrust = - fuselage_drag + wing_drag
 
-    lift_distribution = - wing_lift / root_chord
-    lift_distribution = np.concatenate((np.zeros(n_wing_start),
-                                  lift_distribution * np.ones(n_wing_end - n_wing_start), np.zeros(n_increments - n_wing_end)))
+    wing_lift_distribution = - wing_lift / root_chord
+    wing_lift_distribution = np.concatenate((np.zeros(n_wing_start),
+                                  wing_lift_distribution * np.ones(n_wing_end - n_wing_start), np.zeros(n_increments - n_wing_end)))
 
 
     wing_tail_distribution = wing_tail_weight / root_chord
@@ -84,7 +89,9 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
     normal_load_distribution = np.zeros(n_increments)
 
     #   Cruise load analysis
-    cruise_shear_distribution_slope = - add_arrays(add_arrays(weight_distribution, lift_distribution), wing_tail_distribution)
+    cruise_shear_distribution_slope = - add_arrays(add_arrays(add_arrays(weight_distribution,
+                                                              fuselage_lift_distribution),
+                                                                         wing_lift_distribution), wing_tail_distribution)
     cruise_shear_distribution = np.cumsum(cruise_shear_distribution_slope * 0.001)
 
     cruise_moment_distribution = np.cumsum(cruise_shear_distribution * 0.001)
@@ -127,7 +134,7 @@ def fuselage_internal_loads(external_loads, fuselage_dimensions, type):
 
     elif type == 'max':
         #   Maximum load analysis
-        shear_distribution_slope = - add_arrays(add_arrays(weight_distribution, n_max * lift_distribution), wing_tail_distribution)
+        shear_distribution_slope = n_max * cruise_shear_distribution_slope
         shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
 
         moment_distribution = np.cumsum(shear_distribution * 0.001)
@@ -203,7 +210,8 @@ def fuselage_layout(internal_loads, fuselage_dimensions, stringer_dimensions, ma
 # internal_shear = np.append(np.arange(0, 50), np.arange(50, 0, -1))
 # internal_bending = np.append(100 * np.ones(50), 50 * np.ones(50))
 # internal_normal = np.append(50 * np.ones(50), 100 * np.ones(50))
-fuselage_dimensions = {'width': 0.15, 'height': 0.15, 'length': 0.7, 'wing_xlocation': 0.4, 'root_chord': 0.49078, 'mass': 7}
+fuselage_dimensions = {'width': 0.15, 'height': 0.15, 'length': 0.7, 'wing_xlocation': 0.4,
+                       'root_chord': 0.49078, 'mass': 7, 'drag_coefficient': 0.01, 'lift_coefficient': 0.1}
 external_loads = {'wing_lift': 700, 'wing_drag': 100, 'wing_moment': 100}
 stringer_dimensions = {'width': 0.01, 'height': 0.01, 'thickness': 0.001}
 material_properties = {'tensile strength': 7.501, 'compressive strength': 6.53, 'shear strength': 1.88}

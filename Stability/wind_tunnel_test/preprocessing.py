@@ -1,22 +1,24 @@
 import numpy as np
 import pandas as pd
-
+import subprocess
+import glob
 def get_data_matlab():
-    import subprocess
-
+    
+    script_path = glob.glob("**\\HighLiftTest_PostProcessFile.m", recursive=True)[0]
+    print(script_path)
     # Path to the MATLAB executable or runtime
     matlab_executable = 'matlab'  # Replace with the correct MATLAB executable or runtime path
 
     # Path to the MATLAB script
-    matlab_script = "C:\\Users\\louis\\PycharmProjects\\SVV\\B50\\DSE-Group16\\Stability\\wind_tunnel_test\\sample_data\\HighLiftTest_PostProcessFile.m"  # Replace with the path to your MATLAB script
-
+    matlab_script = script_path
     # Command to run the MATLAB script
     command = [matlab_executable, '-nosplash', '-nodesktop', '-r', f"run('{matlab_script}'); exit;"]
 
     # Run the MATLAB script
     subprocess.call(command)
 
-    df_test_data = pd.read_excel('C:\\Users\\louis\\PycharmProjects\\SVV\\B50\\DSE-Group16\\Stability\\wind_tunnel_test\\sample_data\\wind_tunnel_measurement_data.xlsx')
+    excel_path = glob.glob("**\wind_tunnel_measurement_data.xlsx", recursive=True)[0]
+    df_test_data = pd.read_excel(excel_path)
     
     return df_test_data
 
@@ -38,3 +40,6 @@ def calc_aero_forces(test_matrix = get_test_matrix(), df_test_data = get_data_ma
     data = pd.concat([test_matrix, data], axis=1)
     
     return data
+
+data = get_data_matlab()
+print('test')

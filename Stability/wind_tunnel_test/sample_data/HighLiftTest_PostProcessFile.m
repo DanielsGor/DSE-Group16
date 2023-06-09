@@ -4,8 +4,10 @@
 
 
 function HighLiftTest_PostProcessFile()
+    
+    current_dir = pwd;
     % Call the HighLiftTest_PostProcessFile function with the directory path as an argument
-    directory = 'C:\Users\louis\PycharmProjects\SVV\B50\DSE-Group16\Stability\wind_tunnel_test\sample_data\SampleData';
+    directory = fullfile(current_dir, 'SampleData');
     run_post_processing(directory);
 end
 
@@ -54,7 +56,9 @@ function run_post_processing(directory)
     end
 
     % Save the results to an Excel file
-    output_file = fullfile('C:\Users\louis\PycharmProjects\SVV\B50\DSE-Group16\Stability\wind_tunnel_test\sample_data', 'wind_tunnel_measurement_data.xlsx');
+    output_dir = pwd;
+    
+    output_file = fullfile(output_dir, 'wind_tunnel_measurement_data.xlsx');
     writecell(results, output_file);
     
 end

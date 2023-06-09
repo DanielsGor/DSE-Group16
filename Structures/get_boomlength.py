@@ -73,7 +73,7 @@ def material_properties(mat):
 def get_Lh_Sh(L, xdif):
     lh = xdif+L
     Lh = 10.93/(2 * lh)
-    Sh = .98575/lh
+    Sh = .98/lh
     return(Lh, Sh)
 
 def emp_weight(Sh, t_skin, rho):
@@ -92,7 +92,7 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     return(M, maximum_stress, deflection)
 
 
-lengthrange = np.arange(0, 2, .1)
+lengthrange = np.arange(1, 2, .1)
 tskinrange = np.arange(.0005, .001, .0001)
 thicknessVrange = np.arange(.0005, .001, .0001)
 thicknessHrange = np.arange(.0005, .001, .0001)

@@ -19,11 +19,10 @@ def get_coeff(df, S, c, rho, v):
 
 def split_data(df):
     df_1 = df[df['test series'] == 1]
-    df_2 = df[df['test series'] == 2]
     df_3 = df[df['test series'] == 3]
     df_4 = df[df['test series'] == 4]
 
-    return df_1, df_2, df_3, df_4
+    return df_1, df_3, df_4
 
 def plotting(df):
     #get variables used in test series
@@ -48,49 +47,49 @@ def plotting(df):
 
     print("Longest list:", longest_list)
 
-    if plot:
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-        fig.suptitle('Aerodynamic coefficients vs ' + longest_list)
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+    fig.suptitle('Aerodynamic coefficients vs ' + longest_list)
 
-        #ax1
-        ax1.set_title('Cl' + '-' + longest_list)
-        for i in range(len(list(combinations_dict.values())[0])):
-            y = df[(df[list(combinations_dict.keys())[0]] == list(combinations_dict.values())[0][i]) & (df[list(combinations_dict.keys())[1]] == list(combinations_dict.values())[1][i]) & (df[list(combinations_dict.keys())[2]] == list(combinations_dict.values())[2][i])]['Cl']
-            ax1.plot(x, y, label=list(combinations_dict.keys())[0] + ' = ' + str(list(combinations_dict.values())[0][i]) + ', ' + list(combinations_dict.keys())[1] + ' = ' + str(list(combinations_dict.values())[1][i]) + ', ' + list(combinations_dict.keys())[2] + ' = ' + str(list(combinations_dict.values())[2][i]))
-        ax1.legend()
-        ax1.grid()
-        ax1.set_xlabel(longest_list)
-        ax1.set_ylabel('Cl')
+    #ax1
+    ax1.set_title('Cl' + '-' + longest_list)
+    for i in range(len(list(combinations_dict.values())[0])):
+        y = df[(df[list(combinations_dict.keys())[0]] == list(combinations_dict.values())[0][i]) & (df[list(combinations_dict.keys())[1]] == list(combinations_dict.values())[1][i]) & (df[list(combinations_dict.keys())[2]] == list(combinations_dict.values())[2][i])]['Cl']
+        ax1.plot(x, y, label=list(combinations_dict.keys())[0] + ' = ' + str(list(combinations_dict.values())[0][i]) + ', ' + list(combinations_dict.keys())[1] + ' = ' + str(list(combinations_dict.values())[1][i]) + ', ' + list(combinations_dict.keys())[2] + ' = ' + str(list(combinations_dict.values())[2][i]))
+    ax1.legend()
+    ax1.grid()
+    ax1.set_xlabel(longest_list)
+    ax1.set_ylabel('Cl')
 
-        #ax2
-        ax2.set_title('Cd' + '-' + longest_list)
-        for i in range(len(list(combinations_dict.values())[0])):
-            y = df[(df[list(combinations_dict.keys())[0]] == list(combinations_dict.values())[0][i]) & (df[list(combinations_dict.keys())[1]] == list(combinations_dict.values())[1][i]) & (df[list(combinations_dict.keys())[2]] == list(combinations_dict.values())[2][i])]['Cd']
-            ax2.plot(x, y, label=list(combinations_dict.keys())[0] + ' = ' + str(list(combinations_dict.values())[0][i]) + ', ' + list(combinations_dict.keys())[1] + ' = ' + str(list(combinations_dict.values())[1][i]) + ', ' + list(combinations_dict.keys())[2] + ' = ' + str(list(combinations_dict.values())[2][i]))
-        ax2.legend()
-        ax2.grid()
-        ax2.set_xlabel(longest_list)
-        ax2.set_ylabel('Cd')
+    #ax2
+    ax2.set_title('Cd' + '-' + longest_list)
+    for i in range(len(list(combinations_dict.values())[0])):
+        y = df[(df[list(combinations_dict.keys())[0]] == list(combinations_dict.values())[0][i]) & (df[list(combinations_dict.keys())[1]] == list(combinations_dict.values())[1][i]) & (df[list(combinations_dict.keys())[2]] == list(combinations_dict.values())[2][i])]['Cd']
+        ax2.plot(x, y, label=list(combinations_dict.keys())[0] + ' = ' + str(list(combinations_dict.values())[0][i]) + ', ' + list(combinations_dict.keys())[1] + ' = ' + str(list(combinations_dict.values())[1][i]) + ', ' + list(combinations_dict.keys())[2] + ' = ' + str(list(combinations_dict.values())[2][i]))
+    ax2.legend()
+    ax2.grid()
+    ax2.set_xlabel(longest_list)
+    ax2.set_ylabel('Cd')
 
-        #ax3
-        ax3.set_title('Cm-' + '-' + longest_list)
-        for i in range(len(list(combinations_dict.values())[0])):
-            y = df[(df[list(combinations_dict.keys())[0]] == list(combinations_dict.values())[0][i]) & (df[list(combinations_dict.keys())[1]] == list(combinations_dict.values())[1][i]) & (df[list(combinations_dict.keys())[2]] == list(combinations_dict.values())[2][i])]['Cm']
-            ax3.plot(x, y, label=list(combinations_dict.keys())[0] + ' = ' + str(list(combinations_dict.values())[0][i]) + ', ' + list(combinations_dict.keys())[1] + ' = ' + str(list(combinations_dict.values())[1][i]) + ', ' + list(combinations_dict.keys())[2] + ' = ' + str(list(combinations_dict.values())[2][i]))
-        ax3.legend()
-        ax3.grid()
-        ax3.set_xlabel(longest_list)
-        ax3.set_ylabel('Cm')
+    #ax3
+    ax3.set_title('Cm-' + '-' + longest_list)
+    for i in range(len(list(combinations_dict.values())[0])):
+        y = df[(df[list(combinations_dict.keys())[0]] == list(combinations_dict.values())[0][i]) & (df[list(combinations_dict.keys())[1]] == list(combinations_dict.values())[1][i]) & (df[list(combinations_dict.keys())[2]] == list(combinations_dict.values())[2][i])]['Cm']
+        ax3.plot(x, y, label=list(combinations_dict.keys())[0] + ' = ' + str(list(combinations_dict.values())[0][i]) + ', ' + list(combinations_dict.keys())[1] + ' = ' + str(list(combinations_dict.values())[1][i]) + ', ' + list(combinations_dict.keys())[2] + ' = ' + str(list(combinations_dict.values())[2][i]))
+    ax3.legend()
+    ax3.grid()
+    ax3.set_xlabel(longest_list)
+    ax3.set_ylabel('Cm')
 
-        plt.show()
+    plt.show()
 
     return
 
+def get_derivatives(df):
 
 def main():
     df = combine_data(data, test_matrix)
     df = get_coeff(df, S, c, rho, v)
-    df_1, df_2, df_3, df_4 = split_data(df)
+    df_1, df_3, df_4 = split_data(df)
     plotting(df_4)
 
 if __name__ == '__main__':

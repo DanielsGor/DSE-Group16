@@ -35,16 +35,6 @@ def test_1(alpha = alpha_long, V_pp=V_pp_short, f_burst=f_burst_short, duty_cycl
     print('break')
     return df_test_1
 
-def test_2(alpha = alpha_short, V_pp=V_pp_long, f_burst=f_burst_short, duty_cycle=duty_cycle_short):
-    df_test_2 = pd.DataFrame(columns=['test series', 'alpha', 'V_pp', 'f_burst', 'duty_cycle'])
-    for a in alpha:
-        for v in V_pp:
-            for f in f_burst:
-                for d in duty_cycle:
-                    df_test_2 = pd.concat([df_test_2, pd.DataFrame([[2, a, v, f, d]], columns=['test series', 'alpha', 'V_pp', 'f_burst', 'duty_cycle'])])
-    print('break')  
-    return df_test_2
-
 def test_3(alpha = alpha_short, V_pp=V_pp_short, f_burst=f_burst_long, duty_cycle=duty_cycle_short):
     df_test_3 = pd.DataFrame(columns=['test series', 'alpha', 'V_pp', 'f_burst', 'duty_cycle'])
     for a in alpha:
@@ -65,11 +55,11 @@ def test_4(alpha = alpha_short, V_pp=V_pp_short, f_burst=f_burst_short, duty_cyc
     print('break')
     return df_test_4
 
-def combined_test(test_1=test_1(), test_2=test_2(), test_3=test_3(), test_4=test_4()):
-    df_combined = pd.concat([test_1, test_2, test_3, test_4])
+def combined_test(test_1=test_1(), test_3=test_3(), test_4=test_4()):
+    df_combined = pd.concat([test_1, test_3, test_4])
     # Remove duplicates from df_combined
     df_combined = df_combined.drop_duplicates(subset=['alpha', 'V_pp', 'f_burst', 'duty_cycle'])
-    # get rid of duplicates when V_pp = 0
+    # get rid of duplicates when V_pp = 0 #check if this is still correct!!!!!!!!!!!
     df_combined = df_combined[~((df_combined['V_pp'] == 0) & (df_combined.duplicated(subset=['alpha'], keep='first')))]
 
 

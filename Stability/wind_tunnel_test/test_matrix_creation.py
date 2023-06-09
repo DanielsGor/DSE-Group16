@@ -60,7 +60,7 @@ def combined_test(test_1=test_1(), test_3=test_3(), test_4=test_4()):
     # Remove duplicates from df_combined
     df_combined = df_combined.drop_duplicates(subset=['alpha', 'V_pp', 'f_burst', 'duty_cycle'])
     # get rid of duplicates when V_pp = 0 #check if this is still correct!!!!!!!!!!!
-    df_combined = df_combined[~((df_combined['V_pp'] == 0) & (df_combined.duplicated(subset=['alpha'], keep='first')))]
+    #df_combined = df_combined[~((df_combined['V_pp'] == 0) & (df_combined.duplicated(subset=['alpha'], keep='first')))]
 
 
     '''

@@ -16,19 +16,19 @@ v = 15 # m/s
 
 def main():
     #preprocessing
-    data = calc_aero_forces(x_ac_to_fb=x_ac_to_fb, y_ac_fb=y_ac_fb)
-
+    #data = calc_aero_forces(x_ac_to_fb=x_ac_to_fb, y_ac_fb=y_ac_fb)
+    data = pd.read_excel('Stability\\wind_tunnel_test\\data.xlsx')
     #processing
     #make dimensionless
     data = get_coeff(data, S, c, rho, v)
     #split data into test cases
     df_1, df_3, df_4 = split_data(data)
     test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)
-    test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=True)
-    test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=True)
+    #test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=True)
+    #test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=True)
 
     #get derivatives
-    #test_series1.get_derivatives()
+    test_series1.get_derivatives()
     #test_series3.get_derivatives()
     #test_series4.get_derivatives()
 

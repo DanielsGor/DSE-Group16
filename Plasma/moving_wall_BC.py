@@ -54,8 +54,8 @@ files_csv = ['plasma-x15-y10-v1.csv','plasma-x15-y10-v2.csv','plasma-x15-y10-v3.
 
 
 u_mw,y_mw = get_data_from_csv(files_csv[4])
-u_plasma,y_plasma = get_data_from_csv('u-y.csv')
-u_plasma,y_plasma = normalise(u_plasma,y_plasma)
+u_plasma,y_plasma = get_data_from_csv('u-y_norm.csv')
+# u_plasma,y_plasma = normalise(u_plasma,y_plasma)
 u_norm, y_norm = normalise(u_mw,y_mw)    
 
 mt_plasma = momentum_thickness(u_plasma,y_plasma)
@@ -69,10 +69,10 @@ plt.plot(u_plasma,y_plasma,'o')
 plt.axvline(-0.01)
 plt.axvline(0.01)
 
-# for file in files_csv:
-#     u, y = get_data_from_csv(file)
-#     # u, y = normalise(u,y)
-#     plt.plot(u,y,label=file)
+for file in files_csv:
+    u, y = get_data_from_csv(file)
+    # u, y = normalise(u,y)
+    plt.plot(u,y,label=file)
 
 plt.grid(which='both')
 plt.legend()

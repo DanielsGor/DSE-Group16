@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
-import itertools
-import matplotlib.pyplot as plt
-from preprocessing import get_data_matlab, get_test_matrix, calc_aero_forces
-from processing import combine_data, get_coeff, split_data, plotting
+
+from preprocessing import calc_aero_forces
+from processing import get_coeff, split_data, TestSeries
 
 #model data
 #data for model and force balance
@@ -16,28 +15,25 @@ rho = 1.225 # kg/m^3
 v = 15 # m/s
 
 def main():
-    #get data from matlab
-    mean_norm, mean_ax = get_data_matlab()
+    #preprocessing
+    data = calc_aero_forces(x_ac_to_fb=x_ac_to_fb, y_ac_fb=y_ac_fb)
 
-    #get test matrix
-    test_matrix = get_test_matrix()
+    #processing
+    #make dimensionless
+    data = get_coeff(data, S, c, rho, v)
+    #split data into test cases
+    df_1, df_3, df_4 = split_data(data)
+    test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)
+    test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=True)
+    test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=True)
 
-    #calculate aerodynamic forces
-    data = calc_aero_forces(test_matrix, mean_norm, mean_ax, x_ac_to_fb, y_ac_fb)
+    #get derivatives
+    #test_series1.get_derivatives()
+    #test_series3.get_derivatives()
+    #test_series4.get_derivatives()
 
-    #combine data from wind tunnel test
-    df = combine_data(data, test_matrix)
-
-    #get aerodynamic coefficients
-    df = get_coeff(df, S, c, rho, v)
-
-    #split data into test series
-    df_1, df_2, df_3, df_4 = split_data(df)
-    
-    #plot data
-    plotting(df_1)
-    plotting(df_2)
-    plotting(df_3)
-    plotting(df_4)
 
     return
+
+if __name__ == '__main__':
+    main()

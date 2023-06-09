@@ -11,10 +11,10 @@ def combine_data(data, test_matrix):
     return df
 
 def get_coeff(df, S, c, rho, v):
-    df['Cl'] = df['L'] / (0.5 * rho * S * v**2)
-    df['Cd'] = df['D'] / (0.5 * rho * S * v**2)
-    df['Cm'] = df['M'] / (0.5 * rho * S * v**2 * c)
-    df.drop(['L', 'D', 'M'], axis=1, inplace=True)
+    df['Cl'] = df['Lift'] / (0.5 * rho * S * v**2)
+    df['Cd'] = df['Drag'] / (0.5 * rho * S * v**2)
+    df['Cm'] = df['Moment'] / (0.5 * rho * S * v**2 * c)
+    df.drop(['Lift', 'Drag', 'Moment'], axis=1, inplace=True)
     return df
 
 def split_data(df):

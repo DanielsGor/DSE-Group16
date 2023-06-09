@@ -24,7 +24,7 @@ def get_test_matrix():
     test_matrix = pd.read_excel('Stability\\wind_tunnel_test\\wind_tunnel_test_matrix.xlsx')
     return test_matrix
 
-def calc_aero_forces(test_matrix, df_test_data = get_data_matlab(), x_ac_to_fb = 0, y_ac_fb = 0):
+def calc_aero_forces(test_matrix = get_test_matrix(), df_test_data = get_data_matlab(), x_ac_to_fb = 0, y_ac_fb = 0):
     data = pd.concat([test_matrix, df_test_data], axis=1)
     mean_norm = df_test_data['Mean Norm']
     mean_ax = df_test_data['Mean Ax']

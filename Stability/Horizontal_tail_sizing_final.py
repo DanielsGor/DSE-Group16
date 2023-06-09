@@ -1,7 +1,76 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from constants import g, rho, T, V_cruise, m_tot, ROC, Cm_ac, b, S, A, MAC, lamda, c_r, c_t, C_l_alpha, b_fus, x_bar_ac
+# from constants import g, rho, T, V_cruise, m_tot, ROC, Cm_ac, b, S, A, MAC, lamda, c_r, c_t, C_l_alpha, b_fus, x_bar_ac
 from matplotlib.widgets import Slider, Button
+
+
+V_cruise = 15
+m_tot = 7.68
+ROC = 5
+ldmax = 90
+ldcruise = 83
+C_lmax = 1.6
+C_lcruise = 0.92
+cd0 = 0.011
+Cm_ac = -0.16
+CD0 = 0.015714285714285715
+b = 2.95
+S = 1.1
+A = 7.911363636363636
+LDcruise = 13.2
+MAC = 0.3728813559322034
+e = 0.7
+ReMAC = 450000
+lamda = 0.45
+c_r = 0.4907818149183313
+c_t = 0.22085181671324908
+C_l_alpha = 6.161
+x_bar_ac = 0.25
+rho_atm = 1.225
+SM = 0.05
+r = 50
+delta_h = 80
+lamda_h = 0.8
+A_h = 5
+# C_l_alpha_h = 5.72958
+S_h = 0.1175
+S_v = 0.227
+l_h = 1.2
+l_v = 1.2
+D_p = 0.254
+l_p = 0.5
+B_p = 2
+b_fus = 0.15
+S_fs = 0.105
+fus_l = 0.7
+l_cg = 0.2
+h_fmax = 0.15
+b_f1 = 0.15
+b_f2 = 0.15
+h_f1 = 0.15
+h_f2 = 0.15
+fus_w = 0.25
+fus_h = 0.25
+t_skin = 0.01
+str_pitch = 0.2
+str_w = 0.02
+str_h = 0.02
+str_t = 0.005
+balsa_tens = 7.501
+balsa_comp = 6.53
+l_boom = 0.7
+d_boom = 0.02
+G_A950 = 1250
+b_boom = 0.15
+w_frontCap = 0.05
+w_frontWeb = 0.05
+w_rearCap = 0.05
+w_rearWeb = 0.05
+t_frontCap = 0.005
+t_frontWeb = 0.005
+t_rearCap = 0.005
+g = 9.81
+rho = 1.225
 
 
 """
@@ -16,9 +85,9 @@ tail volume which can be obtained by using the button in the plot.
 
 ####Tail####
 delta_h = 80                    # change in altitude for climb [m]
-A_h= 5                          # aspect ratio horizontal tail [-]
+A_h= 3.92                        # aspect ratio horizontal tail [-]
 lamda_h = 1.0                   # taper ratio horizontal tail [-]
-C_l_alpha_h = 0.1 * 180/np.pi   # lift curve slope horizontal tail [-]
+C_l_alpha_h = 0.1052 * 180/np.pi   # lift curve slope horizontal tail [-]
 
 
 ####Stability####
@@ -185,7 +254,7 @@ def scissor_plot(x_bar_cg_range, htail_volume_stability, htail_volume_stability_
 
     # Slider
     slider_ax = fig.add_axes(slider_pos, facecolor='lightgray')
-    slider = Slider(slider_ax, 'Height', -1, 1.5, valinit=initial_height, orientation='vertical')
+    slider = Slider(slider_ax, 'Height', -1, 1.5, valinit=initial_height, orientation='vertical', valstep=0.00001)
 
     # Button
     button_ax = fig.add_axes([0.85, 0.02, 0.1, 0.03])
@@ -212,6 +281,8 @@ def main_htail():
     # v_climb = calculate_v_climb(r, ROC, delta_h)
     v_climb = 15.1
     C_L_h_alpha = calculate_C_L_h_alpha(A_h, lamda_h, C_l_alpha_h)
+    C_L_h_alpha = 3.6898
+    print("C_L_h_alpha is:", C_L_h_alpha)
     C_L_w_alpha = calculate_C_L_w_alpha(A, lamda, C_l_alpha)
     C_L_Ah_alpha = calculate_C_L_Ah_alpha(C_L_w_alpha, lamda, b, b_fus, c_r, S)
     C_L_h = calculate_C_L_h(A_h)

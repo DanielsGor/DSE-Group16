@@ -49,14 +49,16 @@ def calc_aero_forces(df_test_data, test_matrix, x_ac_to_fb = 0, y_ac_fb = 0):
     L = mean_norm * np.cos(aoa) - mean_ax * np.sin(aoa)
     D = mean_norm * np.sin(aoa) + mean_ax * np.cos(aoa)
     M = x_ac_to_fb * mean_norm + y_ac_fb * mean_ax
-    data = pd.DataFrame({'Lift': L, 'Drag': D, 'Moment': M})
+    aero_forces = pd.DataFrame({'Lift': L, 'Drag': D, 'Moment': M})
 
-    data = pd.concat([test_matrix, data], axis=1)
+    data = pd.concat([test_matrix, aero_forces], axis=1)
     
     return data
 
-df_test_data = get_data_matlab()
-print('done')
-test_matrix = get_test_matrix()
-data = calc_aero_forces(df_test_data, test_matrix)
-print('test')
+
+if __name__ == '__main__':
+    df_test_data = get_data_matlab()
+    print('done')
+    test_matrix = get_test_matrix()
+    data = calc_aero_forces(df_test_data, test_matrix)
+    print('test')

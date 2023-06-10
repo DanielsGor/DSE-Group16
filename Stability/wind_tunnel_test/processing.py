@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 from preprocessing import calc_aero_forces, get_test_matrix
 
 
-def combine_data(data, test_matrix):
+def get_data():
 
-    df = pd.concat([test_matrix, data], axis=1)
+    df = calc_aero_forces()
     return df
 
 def get_coeff(df, S, c, rho, v):
@@ -124,7 +124,13 @@ class TestSeries:
         return
 
 def main():
-    df = combine_data(data, test_matrix)
+    S = 1
+    c = 0.2
+    rho = 1.225
+    v = 15
+
+
+    df = get_data()
     df = get_coeff(df, S, c, rho, v)
     df_1, df_3, df_4 = split_data(df)
     test_series1 = TestSeries(df_1, 'Test Series 1')

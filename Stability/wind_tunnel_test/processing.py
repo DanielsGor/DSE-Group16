@@ -124,6 +124,9 @@ class TestSeries:
         return
 
 def main():
+    """
+    THESE ARE PRELIMINARY VALUES, CHANGE THEM TO THE CORRECT VALUES
+    """
     S = 1
     c = 0.2
     rho = 1.225

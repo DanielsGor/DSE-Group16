@@ -9,15 +9,23 @@ class load_distribution:
         self.V_cruise = df['V_cruise']  # [m/s] cruise speed
         self.rho = df['rho_atm']  # [kg/m^3] air density
         self.MAC = df['MAC']  # [m] chord
-        self.dfF = pd.read_csv(r"C:\Users\oprsc\PycharmProjects\DSE-Group16\Structures\CSV\9june\c_cl_MAC.csv")
+        self.dfF = pd.read_csv(r"C:\Users\oprsc\PycharmProjects\DSE-Group16\Structures\CSV\Wing_Graph_2.csv")
         self.coefdist = None
         self.loaddist = None
         self.intload = None
         self.c = None
-        self.bigchord = 1.2
-        self.smallchord = 0.25
-        self.locbegintaper = 0.8
-        self.locendtaper = 1.490
+        self.bigchord = .2
+        self.smallchord = 0.169
+        self.locbegintaper = 0.9
+        self.locendtaper = 1.4
+        self.sigma_y = 324 # [MPa] yield stress
+        self.UTS = 469 # [MPa] ultimate stress
+        self.E = 73.1e3 # [MPa] Young's modulus
+        self.tau_str = 283 # [MPa] shear stress
+        self.G = 28e3 # [MPa] shear modulus
+        self.sigma = None # [MPa] stress
+        self.tau = None # [MPa] shear stress
+
     def get_array(self):
         # Get rid of all columns except for span and cl and rename them
         # self.dfF = self.dfF.iloc[:, :]
@@ -37,7 +45,7 @@ class load_distribution:
             self.coefdist[self.coefdist[:, 0] > self.locendtaper]))
         self.c = np.append(self.c, a)
         self.c = np.append(self.c, np.full(len(self.coefdist[self.coefdist[:, 0] <= self.locbegintaper]), self.bigchord))
-        print(self.coefdist)
+        # print(self.c)
         return self.coefdist, self.c
     def get_loaddist(self):
         self.loaddist = np.zeros(self.coefdist.shape)
@@ -51,34 +59,43 @@ class load_distribution:
                             (self.coefdist[i, 0] + self.coefdist[i - 1, 0]) / 2 - (self.coefdist[i, 0] + self.coefdist[i + 1, 0]) / 2)
             if i == self.coefdist.shape[0] - 1:
                 self.loaddist[i, 1] = 0.5 * self.coefdist[i, 1] * self.V_cruise ** 2 * self.rho * self.MAC * (self.coefdist[i - 1, 0] - self.coefdist[i, 0])
+        self.loaddist[:, 2] = self.loaddist[:, 1]/(48/1.5)
         print(self.loaddist)
         return self.loaddist
 
     # returns internal load array |span|Bending moment|Internal shear|Internal torsion|
     def get_intload(self):
-
         self.intload = np.zeros((self.coefdist.shape[0], 4))
         self.intload[:, 0] = self.loaddist[:, 0]
         for n in range(self.coefdist.shape[0]):
             self.intload[n, 1] = self.coefdist[n, 2]
             self.intload[n, 2] = -sum(self.loaddist[:n+1, 1])
             if n < self.coefdist.shape[0] - 1:
-                self.intload[n, 3] = self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * (self.coefdist[n, 0] - self.coefdist[n + 1, 0]) - self.intload[n, 1] * 0.2 * self.c[n]
+                self.intload[n, 3] = - self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * (self.coefdist[n, 0] - self.coefdist[n + 1, 0]) + self.intload[n, 1] * 0.2 * self.c[n]
             elif n == self.coefdist.shape[0] - 1:
-                self.intload[n, 3] = self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * self.coefdist[n, 0] * 2 - self.intload[n, 1] * 0.2 * self.c[n]
-        print(self.intload)
+                self.intload[n, 3] = - self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * self.coefdist[n, 0] * 2 + self.intload[n, 1] * 0.2 * self.c[n]
+            # print(self.intload[n, 1] * 0.2 * self.c[n])
+        # print(self.intload)
         return self.intload
+
+    def get_normalstress(self, B):
+        # Ixx for 4 booms of area B [mm^2] each
+        self.Ixx = 4 * B * (0.07 * self.c * 1000 / 2) ** 2
+        self.sigma = self.intload[:, 2] * (0.07 * self.c *1000 / 2) / self.Ixx
+        return self.sigma, self.sigma_y
 
 
 dist = load_distribution(df)
-coefdist = dist.get_array()
+coefdist, c = dist.get_array()
 loaddist = dist.get_loaddist()
 intload = dist.get_intload()
-# plot load distribution
-# plt.plot(coefdist[:, 0], coefdist[:, 1])
-# plt.plot(loaddist[:, 0], loaddist[:, 1])
-plt.plot(intload[:, 0], intload[:, 1])
-plt.show()
+sigma, sigma_y = dist.get_normalstress(20)
+print(sigma, sigma_y)
+# # plot load distribution
+# # plt.plot(coefdist[:, 0], coefdist[:, 1])
+# # plt.plot(loaddist[:, 0], loaddist[:, 1])
+# plt.plot(intload[:, 0], intload[:, 1])
+# plt.show()
 
 
 

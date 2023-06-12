@@ -49,31 +49,38 @@ G = 28.3e3 # MPa / N/mm^2
 E = 73.1e3 # MPa / N/mm^2
 MAC = df['MAC'] # mm
 V_cruise = df['V_cruise'] # m/s
-rho = df['rho'] # kg/m^3
+rho = df['rho_atm'] # kg/m^3
 
 
 
 def get_bendingstress(Mx, B, c):
     Ixx = 4 * B * (0.035 * c) ** 2
-    sigma = 3.8 * Mx * 0.035 * c / Ixx
+    # print(Mx, c, Ixx)
+    sigma = (3.8 * Mx * 0.035 * c / Ixx)
+
     return sigma/sigma_y
 # check sign of Vz
 def get_shear_stress(Vz, c, Mw):
-    qtop = (Mw + Vz * (0.45 - 0.25) * c) / (2 * 0.07 * c * 0.40 * c)
-    qleft = Vz / (2 * 0.07 * c) + (Mw + Vz * (0.45 - 0.25) * c) / (2 * 0.07 * c * 0.40 * c)
-    qbot = (Mw + Vz * (0.45-0.25) * c) / (2 * 0.07 * c * 0.40 * c)
-    qright = - Vz / (2 * 0.07 * c) + (Mw + Vz * (0.45-0.25) * c) / (2 * 0.07 * c * 0.40 * c)
+    qtop = Mw/ (2 * 0.07 * c * 0.40 * c)
+    qleft = - Vz / (2 * 0.07 * c) + Mw/ (2 * 0.07 * c * 0.40 * c)
+    qbot = Mw / (2 * 0.07 * c * 0.40 * c)
+    qright = Vz / (2 * 0.07 * c) + Mw / (2 * 0.07 * c * 0.40 * c)
+    print(qtop, qleft, qbot, qright)
+    print(qtop/tau, qleft/tau, qbot/tau, qright/tau)
 
-ratio = get_bendingstress(25000, 20, 200)
 
 
 dist = load_distribution(df)
 coefdist, c = dist.get_array()
 loaddist = dist.get_loaddist()
 intload = dist.get_intload()
+print(sum(loaddist[:,1])/9.81)
 
-print(ratio)
+# ratio = get_bendingstress(intload[-1,1]*1000, 20, c[-1]*1000)
+# print(ratio)
 
+get_shear_stress(intload[-1,2], c[-1]*1000, intload[-1,3]*1000)
+# print(sigma_y)
 
 
 

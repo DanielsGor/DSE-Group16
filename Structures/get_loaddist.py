@@ -92,10 +92,10 @@ class load_distribution:
         self.intload[:, 3] = self.intload[:, 3] * 1000
         self.c = self.c * 1000
         # print(self.intload[-1, 2], self.c[-1], self.intload[-1, 3])
-        qtop = 3.8 * self.intload[:, 3]/ (2 * 0.07 * self.c * 0.40 * self.c)
-        qleft = -3.8 * self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3]/ (2 * 0.07 * self.c * 0.40 * self.c)
-        qbot = 3.8 * self.intload[:, 3] / (2 * 0.07 * self.c * 0.40 * self.c)
-        qright = 3.8 * self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3] / (2 * 0.07 * self.c * 0.40 * self.c)
+        qtop = 3.8 * (self.intload[:, 3]/ (2 * 0.07 * self.c * 0.40 * self.c))
+        qleft = 3.8 * (-self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3]/ (2 * 0.07 * self.c * 0.40 * self.c))
+        qbot = 3.8 * (self.intload[:, 3] / (2 * 0.07 * self.c * 0.40 * self.c))
+        qright = 3.8 * (self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3] / (2 * 0.07 * self.c * 0.40 * self.c))
         # print(qtop, qleft, qbot, qright)
         print(np.max(np.abs(qtop/5)), np.max(np.abs(qleft/self.tau_str)), np.max(np.abs(qbot/5)), np.max(np.abs(qright/self.tau_str)))
         print(qtop / 5, qleft / self.tau_str, qbot / 5, qright / self.tau_str)

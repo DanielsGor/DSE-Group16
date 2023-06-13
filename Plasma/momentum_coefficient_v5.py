@@ -30,28 +30,25 @@ def get_data_from_csv(filename):
 
 def J(u,y):
     return np.trapz(u*u,y)*1.225
-files_csv = ['plasma-x15-y10-v1.csv',
-             'plasma-x15-y10-v2.csv',
-             'plasma-x15-y10-v3.csv',
-             'plasma-x15-y10-v4.csv',
-             'plasma-x15-y10-v5.csv',
-             'plasma-x15-y10-v6.csv',
-             'plasma-x15-y10-v7.csv',
-             'plasma-x15-y10-v8.csv',
-             'plasma-x15-y10-v9.csv',
-             'plasma-x15-y10-v10.csv']
+files_csv = ['plasma-x9-y10-v5.csv',
+             'plasma-x10-y10-v5.csv',
+             'plasma-x11-y10-v5.csv',
+             'plasma-x12-y10-v5.csv',
+             'plasma-x13-y10-v5.csv',
+             'plasma-x14-y10-v5.csv',
+             'plasma-x15-y10-v5.csv']
 
-u_array = np.asarray(range(len(files_csv)+1))
-C_mu = np.asarray([0])
+u_array = np.asarray(range(len(files_csv)))
+C_mu = np.asarray([])
 for file in files_csv:
     u, y = get_data_from_csv(file)
-    C_mu = np.append(C_mu,J(u,y)/(15.1**2*0.5*1.225*0.1692))
+    C_mu = np.append(C_mu,J(u,y))#/(15.1**2*0.5*1.225*0.1692))
 
 # plt.style.use('ggplot')
 
-plt.plot(u_array,C_mu*100)
+plt.plot((u_array+9),C_mu*100)
 # plt.legend()
 # plt.grid()
-plt.xlabel('Moving wall velocity [m/s]', fontsize='14')
-plt.ylabel('$c_{\mu}$ [%]', fontsize='14')
+plt.xlabel('Location downstream [mm]', fontsize='14')
+plt.ylabel('$J$ [kg m/s]', fontsize='14')
 plt.show()

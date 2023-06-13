@@ -10,7 +10,7 @@ import math
 # Open the text document
 x_airfoil = []
 y_airfoil = []
-with open("AirfoilData/NACA0012.txt", "r") as file:
+with open("AirfoilData/MH115.txt", "r") as file:
     for line in file:
         # Read the contents of the file
         x, y = map(float, line.strip().split())
@@ -123,6 +123,7 @@ def calculate_spline_length(x, y):
     return total_length, segments, cg_spine
 
 a , b, cg_spine = calculate_spline_length(x_airfoil, y_airfoil)
+print('hello', a)
 
 def IdealisedBoom(w_cap, t_cap, x_cgcap, y_cgcap, t_skin, cg_airfoil, Mx, My, spline, it):
     cg_cap = np.array([x_cgcap, y_cgcap])

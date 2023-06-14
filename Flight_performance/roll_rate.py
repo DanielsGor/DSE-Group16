@@ -24,6 +24,7 @@ def fun(roll_rate2):
     global_yaw_angle = 0
     gs = [0] 
     roll_rates = [0]
+    Vs = [V]
     phi = 0
     roll_rate = 0
     t = 0
@@ -32,9 +33,13 @@ def fun(roll_rate2):
         roll_rate += roll_rate2 * dt
         phi += roll_rate* dt
         a_centripetal = np.tan(np.deg2rad(phi)) * m * g
-        R = V**2/a_centripetal
         
-        d_circle_angle = V/R *dt
+        load = np.sqrt(np.arctan(phi+1))
+        Vcurrent = np.sqrt(load)* V
+
+        R = Vcurrent**2/a_centripetal
+        
+        d_circle_angle = Vcurrent/R *dt
 
         x_n = x[-1] + R * np.cos(global_yaw_angle) - R * (np.cos(global_yaw_angle+d_circle_angle))
         y_n = y[-1] - R * np.sin (global_yaw_angle) + R * (np.sin(global_yaw_angle+d_circle_angle))
@@ -48,19 +53,46 @@ def fun(roll_rate2):
         global_yaw_angle += d_circle_angle
         gs.append(global_yaw_angle)
         roll_rates.append(roll_rate)
+        Vs.append(Vcurrent)
     
-    return x, y, phis, roll_rates
+    return time, x, y, phis, roll_rates, Vs
 
-x = [0]
+x = [20]
 
 while np.abs(x[-1] - 25) > accuracy:
-    roll_rate2_init += droll_rate2
-    x,y,phis, roll_rates = fun(roll_rate2_init)
+    roll_rate2_init += (x[-1]-25)/10
+    time, x,y,phis, roll_rates, Vs = fun(roll_rate2_init)
 
 max_load = np.sqrt(np.arctan(max(phis))+1)
 print(max_load, max(phis))
-print (x[-1],y[-1])
+
+print ('max load factor:', max_load, '\nmax angle:', max(phis), '\nmax roll rate:', max(roll_rates),'\nRoll acceleration', roll_rate2_init)
 plt.plot (x,y)
 plt.show()
 print(roll_rate2_init)
 print(np.deg2rad(max(roll_rates)))
+
+#final results
+
+from matplotlib import cycler
+colors = cycler('color',
+                ['#165baa', '#d382ec', '#34a1c7',
+                 '#f765a3', '#0b1354', '#ffa4b6',
+                 '#f2e2aa', '#f9d1d1'])
+plt.rc('axes', facecolor='#E9E9E9', edgecolor='none',
+       axisbelow=True, grid=True, prop_cycle=colors)
+plt.rc('grid', color='w', linestyle='solid')
+plt.rc('xtick', direction='out', color='gray')
+plt.rc('ytick', direction='out', color='gray')
+plt.rc('patch', edgecolor='#E6E6E6')
+plt.rc('lines', linewidth=2)
+           
+plt.plot (x,y, color = '#34A1C7')
+plt.plot ([50-xs for xs in x],y, color = '#34A1C7', label = 'Flight path')
+
+
+plt.legend(facecolor="white", fontsize='12')
+plt.xlabel('x[m]', fontsize='14')
+plt.ylabel('y[m]', fontsize='14')
+           
+plt.show()

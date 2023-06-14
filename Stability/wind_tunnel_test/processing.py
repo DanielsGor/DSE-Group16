@@ -1,8 +1,23 @@
 import numpy as np
 import pandas as pd
+import scipy as sc
 import itertools
+from matplotlib import cycler
 import matplotlib.pyplot as plt
 from preprocessing import calc_aero_forces, get_test_matrix
+
+# Plotting settings
+colors = cycler('color',
+                ['#165baa', '#d382ec', '#34a1c7',
+                 '#f765a3', '#0b1354', '#ffa4b6',
+                 '#f2e2aa', '#f9d1d1'])
+plt.rc('axes', facecolor='#E9E9E9', edgecolor='none',
+       axisbelow=True, grid=True)
+plt.rc('grid', color='w', linestyle='solid')
+plt.rc('xtick', direction='out', color='gray')
+plt.rc('ytick', direction='out', color='gray')
+plt.rc('patch', edgecolor='#E6E6E6')
+#plt.rc('lines', linewidth=2)
 
 
 def get_data():
@@ -79,30 +94,30 @@ class TestSeries:
             debug_duty_cycle = list(self.combinations_dict.values())[2][i]
             y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cl']
             ax1.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
-        #ax1.legend()
-        ax1.grid()
-        ax1.set_xlabel(self.longest_list)
-        ax1.set_ylabel('Cl')
+        #ax1.legend(facecolor="white", fontsize='12')
+        #ax1.grid(which='both')
+        ax1.set_xlabel(self.longest_list, fontsize='14')
+        ax1.set_ylabel('Cl', fontsize='14')
 
         #ax2
         ax2.set_title('Cd' + '-' + self.longest_list)
         for i in range(len(list(self.combinations_dict.values())[0])):
             y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cd']
             ax2.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
-        #ax2.legend()
-        ax2.grid()
-        ax2.set_xlabel(self.longest_list)
-        ax2.set_ylabel('Cd')
+        #ax2.legend(facecolor="white", fontsize='12')
+        #ax2.grid(which='both')
+        ax2.set_xlabel(self.longest_list, fontsize='14')
+        ax2.set_ylabel('Cd', fontsize='14')
 
         #ax3
         ax3.set_title('Cm-' + '-' + self.longest_list)
         for i in range(len(list(self.combinations_dict.values())[0])):
             y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cm']
             ax3.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
-        #ax3.legend()
-        ax3.grid()
-        ax3.set_xlabel(self.longest_list)
-        ax3.set_ylabel('Cm')
+        #ax3.legend(facecolor="white", fontsize='12')
+        #ax3.grid(which='both')
+        ax3.set_xlabel(self.longest_list, fontsize='14')
+        ax3.set_ylabel('Cm', fontsize='14')
 
         plt.show()
 
@@ -114,12 +129,16 @@ class TestSeries:
             cd = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cd']
             cm = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cm']
             #take derivative of each measurement to the next
-            cl_derivative = cl.diff()/self.x.diff()
-            cd_derivative = cd.diff()/self.x.diff()
-            cm_derivative = cm.diff()/self.x.diff()
-            self.measurements['Cl Derivative ' + list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i])] = cl_derivative
-            self.measurements['Cd Derivative ' + list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i])] = cd_derivative
-            self.measurements['Cm Derivative ' + list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i])] = cm_derivative
+            cl_int = sc.interpolate.CubicSpline(self.x, cl, bc_type='natural')
+            cd_int = sc.interpolate.CubicSpline(self.x, cd, bc_type='natural')
+            cm_int = sc.interpolate.CubicSpline(self.x, cm, bc_type='natural')
+            cl_deriv = cl_int(self.measurements.index, nu=1)
+            cd_deriv = cd_int(self.measurements.index, nu=1)
+            cm_deriv = cm_int(self.measurements.index, nu=1)
+            #add derivative values to dataframe
+            self.measurements['Cl Derivative ' + list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i])] = cl_deriv
+            self.measurements['Cd Derivative ' + list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i])] = cd_deriv
+            self.measurements['Cm Derivative ' + list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i])] = cm_deriv
             
         return
 

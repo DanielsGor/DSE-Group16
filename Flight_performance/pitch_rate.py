@@ -84,7 +84,7 @@ ns = Ls/Ws
 plt.plot(times[:-3],pitch_dot2(dt,global_pitch_angles))
 plt.show()
 
-plt.plot(times,pitch_rates)
+plt.plot(times,Vs)
 plt.show()
 
 plt.plot (x,y)

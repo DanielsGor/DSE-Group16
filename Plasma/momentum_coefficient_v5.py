@@ -29,48 +29,27 @@ def get_data_from_csv(filename):
     return u_mw,y_mw
 
 def J(u,y):
-    return np.trapz(u*u,y)*1.225
+    return np.trapz(u**2,y)*1.225
+files_csv = ['plasma-x9-y10-v5.csv',
+             'plasma-x10-y10-v5.csv',
+             'plasma-x11-y10-v5.csv',
+             'plasma-x12-y10-v5.csv',
+             'plasma-x13-y10-v5.csv',
+             'plasma-x14-y10-v5.csv',
+             'plasma-x15-y10-v5.csv']
 
-C_mu_exp = np.asarray([])
-V_pp = np.asarray([])
-with open('Plasma/momentum-voltage.csv', newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        V_pp = np.append(V_pp,float(row['V_pp']))
-        C_mu_exp = np.append(C_mu_exp,float(row['c_mu'])/100)
-J_exp = C_mu_exp*15**2*1.225*0.225/2
-
-
-files_csv = ['plasma-x15-y10-v1.csv',
-             'plasma-x15-y10-v2.csv',
-             'plasma-x15-y10-v3.csv',
-             'plasma-x15-y10-v4.csv',
-             'plasma-x15-y10-v5.csv',
-             'plasma-x15-y10-v6.csv',
-             'plasma-x15-y10-v7.csv',
-             'plasma-x15-y10-v8.csv',
-             'plasma-x15-y10-v9.csv',
-             'plasma-x15-y10-v10.csv']
-
-u_array = np.asarray(range(len(files_csv)+1))
-J_sim = np.asarray([0])
+u_array = np.asarray(range(len(files_csv)))
+C_mu = np.asarray([])
 for file in files_csv:
     u, y = get_data_from_csv(file)
-    # C_mu = np.append(C_mu,J(u,y)/(15.1**2*0.5*1.225*0.1692))
-    J_sim = np.append(J_sim,J(u,y)*1.345767719100536)
+    C_mu = np.append(C_mu,J(u,y))#/(15.1**2*0.5*1.225*0.1692))
 
 # plt.style.use('ggplot')
 
-
-# plt.plot(V_pp,J_exp)
-print(np.polyfit(V_pp,J_exp,2))
-plt.plot(u_array,J_sim)
-print(np.polyfit(u_array,J_sim,2))
-
-p = np.poly1d([2.45983381e-03, 9.85037659e-01, 1.53444040e+01])
-# plt.plot(V_pp,p(V_pp))
+plt.plot((u_array+9),C_mu)
 # plt.legend()
 # plt.grid()
-plt.xlabel('Moving wall velocity [m/s]', fontsize='14')
+print(C_mu[1]/C_mu[-1])
+plt.xlabel('Location downstream [mm]', fontsize='14')
 plt.ylabel('$J$ [kg m/s]', fontsize='14')
 plt.show()

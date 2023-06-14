@@ -29,7 +29,7 @@ def get_data_from_csv(filename):
     return u_mw,y_mw
 
 def J(u,y):
-    return np.trapz(u*u,y)*1.225
+    return np.trapz(u**2,y)*1.225
 files_csv = ['plasma-x9-y10-v5.csv',
              'plasma-x10-y10-v5.csv',
              'plasma-x11-y10-v5.csv',
@@ -46,9 +46,10 @@ for file in files_csv:
 
 # plt.style.use('ggplot')
 
-plt.plot((u_array+9),C_mu*100)
+plt.plot((u_array+9),C_mu)
 # plt.legend()
 # plt.grid()
+print(C_mu[1]/C_mu[-1])
 plt.xlabel('Location downstream [mm]', fontsize='14')
 plt.ylabel('$J$ [kg m/s]', fontsize='14')
 plt.show()

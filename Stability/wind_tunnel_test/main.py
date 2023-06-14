@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 from preprocessing import calc_aero_forces
 from processing import get_coeff, split_data, TestSeries
 
@@ -26,14 +25,14 @@ def main():
     data = get_coeff(data, S, c, rho, v)
     #split data into test cases
     df_1, df_3, df_4 = split_data(data)
-    test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=False)
-    test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=False)
-    test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=False)
+    test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)
+    test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=True)
+    test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=True)
 
     #get derivatives
-    test_series1.get_derivatives()
-    test_series3.get_derivatives()
-    test_series4.get_derivatives()
+    #test_series1.get_derivatives()
+    #test_series3.get_derivatives()
+    #test_series4.get_derivatives()
     print('Variable test series 1: ', test_series1.x)
     print('Variable test series 3: ', test_series3.x)
     print('Variable test series 4: ', test_series4.x)

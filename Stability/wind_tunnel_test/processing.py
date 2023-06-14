@@ -93,7 +93,10 @@ class TestSeries:
             debug_f_burst = list(self.combinations_dict.values())[1][i]
             debug_duty_cycle = list(self.combinations_dict.values())[2][i]
             y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cl']
-            ax1.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
+            if len(self.x) == len(y):
+                ax1.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
+            else:
+                print('Skipped Cl vs ' + self.longest_list + ' for ' +  list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
         #ax1.legend(facecolor="white", fontsize='12')
         #ax1.grid(which='both')
         ax1.set_xlabel(self.longest_list, fontsize='14')
@@ -103,7 +106,10 @@ class TestSeries:
         ax2.set_title('Cd' + '-' + self.longest_list)
         for i in range(len(list(self.combinations_dict.values())[0])):
             y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cd']
-            ax2.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
+            if len(self.x) == len(y):
+                ax2.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
+            else:
+                print('Skipped Cd vs ' + self.longest_list + ' for ' +  list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
         #ax2.legend(facecolor="white", fontsize='12')
         #ax2.grid(which='both')
         ax2.set_xlabel(self.longest_list, fontsize='14')
@@ -113,7 +119,10 @@ class TestSeries:
         ax3.set_title('Cm-' + '-' + self.longest_list)
         for i in range(len(list(self.combinations_dict.values())[0])):
             y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cm']
-            ax3.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
+            if len(self.x) == len(y):
+                ax3.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
+            else:
+                print('Skipped Cm vs ' + self.longest_list + ' for ' +  list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
         #ax3.legend(facecolor="white", fontsize='12')
         #ax3.grid(which='both')
         ax3.set_xlabel(self.longest_list, fontsize='14')

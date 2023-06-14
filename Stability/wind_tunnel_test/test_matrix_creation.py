@@ -4,8 +4,8 @@ import pandas as pd
 
 
  
-alpha_short = [0, 4, 8]
-alpha_long = [0, 4, 8, 10, 12]
+alpha_short = [-2, 0, 2, 5, 8]
+alpha_long = [-8, -5, -2, 0, 2, 5, 8, 10, 12]
 
 
 V_pp_short = [0, 12]

@@ -119,8 +119,8 @@ d_alpha_root = 1
 d_cr = 0.1
 d_b_s = 0.1
 
-root_angles = np.arange(3,9+d_alpha_root,d_alpha_root)
-root_chords = np.arange(0.2,0.6 + d_cr,d_cr)
+root_angles = np.arange(6,6+d_alpha_root,d_alpha_root)
+root_chords = np.arange(0.2,0.2 + d_cr,d_cr)
 b_ss = np.arange(0.5,1.3 + d_b_s, d_b_s)
 
 def optimisation (c_r, alpha_root, b_s):

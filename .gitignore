@@ -186,3 +186,7 @@ Stability/stability/OpenVSP/testingOpenVSP_VSPGeom.vkey
 Stability/stability/OpenVSP/testingOpenVSP_VSPGeom.vspaero
 Stability/stability/OpenVSP/testingOpenVSP_VSPGeom.vspgeom
 Stability/stability/OpenVSP/testingOpenVSP_VSPGeom_DegenGeom.csv
+Stability/stability/OpenVSP/OpenVSP-3.34.0-win64/msvcp140.dll
+Stability/stability/OpenVSP/OpenVSP-3.34.0-win64/vcruntime140.dll
+Stability/stability/OpenVSP/OpenVSP-3.34.0-win64/vcruntime140_1.dll
+Stability/stability/OpenVSP/OpenVSP-3.34.0-win64/vsp.exe

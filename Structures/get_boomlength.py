@@ -81,15 +81,17 @@ def emp_weight(Sh, t_skin, rho):
     return(Wemp)
 
 def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, width, height, E_modulus_boom, type):
+    n_max = 3.75
     Lh, Sh = get_Lh_Sh(length, xdif)
     Mempennage = emp_weight(Sh, tskin, rho_tail)
     Mboom, Ixx, Iyy = boom_properties(type, thicknessV, thicknessH, rho_boom, length, width, height)
+    Mboom_tot = 2 * Mboom
     M = 2 * Mboom + Mempennage
-    F = Lh - (Mempennage * 9.81) / 2
+    F = n_max * Lh - (Mempennage * 9.81) / 2
     deflection = deflection_angle_by_pointforce(F, length, E_modulus_boom, Ixx, Mboom)
     My = F * length
     maximum_stress = BendingStress(0, My, Ixx, Iyy, type, width, height)[0]
-    return(M, maximum_stress, deflection)
+    return(M, maximum_stress, deflection, Mboom_tot, Mempennage)
 
 
 lengthrange = np.arange(0.2, 2, .1)
@@ -102,7 +104,7 @@ typ = ['rectangular', 'circular']
 
 optimal_config = {'length': None, 'skin thickness': None, 'vertical boom thickness': None,
                   'horizontal boom thickness': None, 'width': None, 'height': None,
-                  'type': None, 'material': None, 'mass': float('inf')}
+                  'type': None, 'material': None, 'mass': float('inf'), 'mass boom': None, 'mass empennage': None}
 
 for i in lengthrange:
     for j in tskinrange:
@@ -113,7 +115,7 @@ for i in lengthrange:
                         for o in typ:
                             for p in ['aluminum 2024-T3']:
                                 r, E, st, sc = material_properties(p)
-                                M, s, d = finalmass(i, .0222, j, 104, k, l, r, m, n, E, o)
+                                M, s, d, Mb, Me = finalmass(i, .0222, j, 104, k, l, r, m, n, E, o)
                                 if M < optimal_config['mass'] and s < sc and d < 0.5:
                                     optimal_config['length'] = i
                                     optimal_config['skin thickness'] = j
@@ -126,6 +128,8 @@ for i in lengthrange:
                                     optimal_config['stress'] = s
                                     optimal_config['deflection'] = d
                                     optimal_config['material'] = p
+                                    optimal_config['mass boom'] = Mb
+                                    optimal_config['mass empennage'] = Me
                                     print(optimal_config)
                                     print('------------------------------------')
 

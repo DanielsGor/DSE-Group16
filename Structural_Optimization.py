@@ -1,26 +1,30 @@
-from Get_Fuselage import *
 from constants import df
+from Structures.get_loaddist import load_distribution
+import numpy as np
 #   Clean this code
 
 class fuselage:
-    def __init__(self):
+    def __init__(self, df):
         # create self attributes with the lines of code below
-        self.length = df['fus_l']  # Length of the fuselage in meters
-        self.width = df['fus_w']  # Width of the fuselage in meters
-        self.height = df['fus_h']  # Height of the fuselage in meters
-        self.skin_thickness = df['t_skin']  # Thickness of the fuselage skin in meters
-        self.mass = df['fus_h']  # Fuselage mass in kg
+        self.length = df['l_fus']  # Length of the fuselage in meters
+        self.width = df['w_fus']  # Width of the fuselage in meters
+        self.height = df['h_fmax']  # Height of the fuselage in meters
+        self.skin_vthickness = None
+        self.skin_hthickness = None
+        self.mass = df['m_fus']  # Fuselage mass in kg
         self.wingbox_location = df['wingbox_loc']    # Distance of the wingbox edge from the fuselage nose in meters
         self.root_chord = df['c_r']  # Root chord of the wing in meters
-        self.stringer_width = df['str_w']  # Width of the stringers in meters
-        self.stringer_height = df['str_h']  # Height of the stringers in meters
-        self.stringer_thickness = df['str_t']  # Thickness of the stringers in meters
-        self.mat_tens = df['balsa_tens']  # Tensile strength of balsasud ultralite in MPa
-        self.mat_comp = df['balsa_comp']  # Compressive strength of balsasud ultralite in MPa
-        self.mat_shear = None  # Shear strength of balsasud ultralite in MPa
+        self.stringer_width = None  # Width of the stringers in meters
+        self.stringer_height = None  # Height of the stringers in meters
+        self.stringer_thickness = None  # Thickness of the stringers in meters
         self.dist = load_distribution(df)
+        self.array = self.dist.get_array()
         self.wing_lift = sum(self.dist.get_loaddist()[:, 1])
         self.wing_drag = sum(self.dist.get_loaddist()[:, 2])
+        self.mat_tens = None  # Tensile strength of balsasud ultralite in MPa
+        self.mat_comp = None  # Compressive strength of balsasud ultralite in MPa
+        self.mat_shear = None  # Shear strength of balsasud ultralite in MPa
+        self.mat_density = None  # Density of balsasud ultralite in kg/m^3
         self.max_load_factor = df['n_max']  # Maximum load factor
         self.fuselage_drag_coefficient = None
         self.fuselage_lift_coefficient = None
@@ -36,8 +40,8 @@ class fuselage:
         self.boom_area = None
         self.result = None
         self.type = 'max'
-        self.fuselage_vthickness = None
-        self.fuselage_hthickness = None
+
+
 
 
 
@@ -59,15 +63,17 @@ class fuselage:
         wingbox_location = self.wingbox_location
         root_chord = self.root_chord
         fuselage_mass = self.mass  # [kg] Fuselage mass
-        fuselage_drag_coefficient = cube_drag_coefficient  # [-] Fuselage drag coefficient
+        fuselage_drag_coefficient = self.fuselage_drag_coefficient  # [-] Fuselage drag coefficient
 
-        if self.fuselage_drag_coefficient is not None:
-            fuselage_drag_coefficient = self.fuselage_drag_coefficient
 
-        fuselage_lift_coefficient = 0
+        if self.fuselage_drag_coefficient is None:
+            fuselage_drag_coefficient = cube_drag_coefficient
 
-        if self.fuselage_lift_coefficient is not None:
-            fuselage_lift_coefficient = self.fuselage_lift_coefficient
+
+        fuselage_lift_coefficient = self.fuselage_lift_coefficient
+
+        if self.fuselage_lift_coefficient is None:
+            fuselage_lift_coefficient = 0
 
 
         wing_start_location = fuselage_length - wingbox_location - (root_chord / 2)
@@ -146,49 +152,49 @@ class fuselage:
 
         cruise_normal_load_distribution = - (fuselage_drag_distribution + wing_drag_distribution)
 
-        if type == 'cruise':
-            shear_distribution = cruise_shear_distribution
+        if self.type == 'cruise':
+            self.shear_distribution = cruise_shear_distribution
 
-            moment_distribution = cruise_moment_distribution
+            self.moment_distribution = cruise_moment_distribution
 
-            normal_load_distribution = cruise_normal_load_distribution
+            self.normal_load_distribution = cruise_normal_load_distribution
 
-        elif type == 'launch':
+        elif self.type == 'launch':
             #   Launch load analysis
-            shear_distribution = cruise_shear_distribution
+            self.shear_distribution = cruise_shear_distribution
 
-            moment_distribution = cruise_moment_distribution
+            self.moment_distribution = cruise_moment_distribution
 
-            normal_load_distribution = np.append(launch_force * np.ones(n_increments // 2),
+            self.normal_load_distribution = np.append(launch_force * np.ones(n_increments // 2),
                                                  -launch_force * np.ones(n_increments // 2))
 
-        elif type == 'deployment':
+        elif self.type == 'deployment':
             #   Parachute deployment load analysis
-            shear_distribution = cruise_shear_distribution
+            self.shear_distribution = cruise_shear_distribution
 
-            moment_distribution = cruise_moment_distribution
+            self.moment_distribution = cruise_moment_distribution
 
-            normal_load_distribution = np.append(parachute_deployment_drag * np.ones(n_increments // 2),
+            self.normal_load_distribution = np.append(parachute_deployment_drag * np.ones(n_increments // 2),
                                                  -parachute_deployment_drag * np.ones(n_increments // 2))
 
-        elif type == 'landing':
+        elif self.type == 'landing':
             #   Cushion load analysis
             shear_distribution_slope = - add_arrays(add_arrays(weight_distribution, wing_tail_distribution),
                                                     cushion_lift_distribution)
-            shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
+            self.shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
 
-            moment_distribution = np.cumsum(shear_distribution * 0.001)
+            self.moment_distribution = np.cumsum(shear_distribution * 0.001)
 
-            normal_load_distribution = np.zeros(n_increments)
+            self.normal_load_distribution = np.zeros(n_increments)
 
-        elif type == 'max':
+        elif self.type == 'max':
             #   Maximum load analysis
             shear_distribution_slope = n_max * cruise_shear_distribution_slope
-            shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
+            self.shear_distribution = np.cumsum(shear_distribution_slope * 0.001)
 
-            moment_distribution = np.cumsum(shear_distribution * 0.001)
+            self.moment_distribution = np.cumsum(shear_distribution * 0.001)
 
-            normal_load_distribution = - n_max * add_arrays(fuselage_drag_distribution, wing_drag_distribution)
+            self.normal_load_distribution = - n_max * add_arrays(fuselage_drag_distribution, wing_drag_distribution)
 
         return self.shear_distribution, self.moment_distribution, self.normal_load_distribution, self.wingbox_normal_distribution
 
@@ -206,21 +212,21 @@ class fuselage:
         compressive_stress = min(normal_stress_1, normal_stress_2)
         tensile_stress = max(normal_stress_1, normal_stress_2)
 
-        result = False
+        self.result = False
 
         if compressive_stress < compressive_strength and tensile_stress < tensile_strength:
-            result = True
+            self.result = True
 
         return self.result
 
     def boom_reduction(self):
         fuselage_width = self.width
         fuselage_height = self.height
-        fuselage_vthickness = self.fuselage_vthickness
-        fuselage_hthickness = self.fuselage_hthickness
+        skin_vthickness = self.skin_vthickness
+        skin_hthickness = self.skin_hthickness
 
-        Bv = fuselage_vthickness * fuselage_height / 6
-        Bh = fuselage_hthickness * fuselage_width / 2
+        Bv = skin_vthickness * fuselage_height / 6
+        Bh = skin_hthickness * fuselage_width / 2
 
         self.boom_area = self.boom_area - Bv - Bh
 
@@ -230,7 +236,7 @@ class fuselage:
         fuselage_length = self.length
         fuselage_width = self.width
         fuselage_height = self.height
-        fuselage_vthickness = self.fuselage_vthickness
+        skin_vthickness = self.skin_vthickness
         wing_xlocation = self.wingbox_location
         root_chord = self.root_chord
         wing_start_location = fuselage_length - wing_xlocation - (root_chord / 2)
@@ -251,7 +257,7 @@ class fuselage:
 
         normal_stress_1 = (bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
         normal_stress_2 = (- bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
-        shear_stress_v = shear / (2 * fuselage_vthickness) / 10 ** 6  # In MPa
+        shear_stress_v = shear / (2 * skin_vthickness) / 10 ** 6  # In MPa
         compressive_stress = min(normal_stress_1, normal_stress_2)
         tensile_stress = max(normal_stress_1, normal_stress_2)
 
@@ -266,8 +272,8 @@ class fuselage:
         wingbox_normal = self.wingbox_normal_distribution[n_wbox]
 
         mohr_normal_x = (bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
-        mohr_normal_y = wingbox_normal / (2 * fuselage_vthickness) / 10 ** 6  # In MPa
-        mohr_shear = shear / (2 * fuselage_vthickness) / 10 ** 6  # In MPa
+        mohr_normal_y = wingbox_normal / (2 * skin_vthickness) / 10 ** 6  # In MPa
+        mohr_shear = shear / (2 * skin_vthickness) / 10 ** 6  # In MPa
         #   Assume that the normal stress acts only in the horizontal direction
 
         normal_stress_avg = (mohr_normal_x + mohr_normal_y) / 2
@@ -289,51 +295,37 @@ class fuselage:
         radius = np.sqrt(self.boom_area / np.pi)
         self.stringer_height = 4 * radius
         self.stringer_width = 4 * radius
-        self.stringer_thickness = self.boom_area / (height * width)
+        self.stringer_thickness = self.boom_area / (self.stringer_height * self.stringer_width)
 
         return self.stringer_height, self.stringer_width, self.stringer_thickness
 
-# Define the optimization parameters
-max_stringer_number = 10  # Maximum number of stringers allowed
-max_stringer_dimension = 100  # Maximum dimension of stringers allowed
-max_weight = float('inf')  # Maximum weight allowed (initialized with infinity)
-min_cost = float('inf')  # Minimum cost (initialized with infinity)
-max_recyclability = 0  # Maximum recyclability (initialized with 0)
+fus = fuselage(df)
+fus.shear_distribution, fus.moment_distribution, fus.normal_load_distribution, fus.wingbox_normal_distribution  = fus.fuselage_internal_loads()
+fus.mat_comp = 345 * 10**6
+fus.mat_tens = 345 * 10**6
+fus.mat_shear = 207 * 10**6
+fus.mat_density = 2800
+
+stringer_dimensions = {'height': None, 'width': None, 'thickness': None, 'mass': float('inf')}
 
 # Loop through different stringer numbers and dimensions
-for stringer_number in range(1, max_stringer_number + 1):
-    for height in range(1, max_stringer_dimension + 1):
-        for width in range(1, max_stringer_dimension + 1):
-            for thickness in range(1, max_stringer_dimension + 1):
-                # Calculate weight based on stringer number and dimensions
-                weight = calculate_weight(stringer_number, height, width, thickness)
-
-                # Calculate cost based on stringer number and dimensions
-                cost = calculate_cost(stringer_number, height, width, thickness)
-
-                # Calculate recyclability based on stringer number and dimensions
-                recyclability = calculate_recyclability(stringer_number, height, width, thickness)
-
-                # Check if the current solution is better than the previous best
-                if weight <= max_weight and cost <= min_cost and recyclability >= max_recyclability:
-                    # Update the best solution
-                    best_stringer_number = stringer_number
-                    best_height = height
-                    best_width = width
-                    best_thickness = thickness
-                    max_weight = weight
-                    min_cost = cost
-                    max_recyclability = recyclability
-
-# Print the optimized solution
-print("Optimized Solution:")
-print("Stringer Number:", best_stringer_number)
-print("Height:", best_height)
-print("Width:", best_width)
-print("Thickness:", best_thickness)
-print("Weight:", max_weight)
-print("Cost:", min_cost)
-print("Recyclability:", max_recyclability)
+# Still need to account for different materials and include Mohr's circle
+for b in np.arange(10**-6, 10**-4, 10**-6):
+    fus.boom_area = b
+    if fus.primary_stress_check() is True:
+        for c in np.arange(0.001, 0.010, 0.001):
+            fus.skin_vthickness = c
+            for d in np.arange(0.001, 0.010, 0.001):
+                fus.skin_hthickness = d
+                fus.boom_area = fus.boom_reduction()
+                if fus.secondary_stress_check() is True:
+                    h, w, t = fus.stiffener_sizing()
+                    m = 4 * fus.mat_density * fus.length * (h * w + 2 * h * t + 2 * w * t)
+                    if m < stringer_dimensions['mass']:
+                        stringer_dimensions['height'] = h
+                        stringer_dimensions['width'] = w
+                        stringer_dimensions['thickness'] = t
+                        stringer_dimensions['mass'] = m
 
 
 

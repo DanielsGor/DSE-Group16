@@ -27,7 +27,7 @@ def variation(parameter_index, variation):
 
 final_result = np.zeros((1,np.shape(scores)[0]))
 
-for var in [0.10,0.20,-0.1,-0.2]:    
+for var in [0.10,0.20,0.3,-0.1,-0.2,-0.3]:    
     for param_index in range(len(weights)):
         newWeights1 = variation(param_index, var)
         final_result += results(scores @ newWeights1/4)

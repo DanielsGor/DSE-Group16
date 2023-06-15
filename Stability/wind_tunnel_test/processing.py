@@ -46,6 +46,9 @@ class TestSeries:
         self.name = name
         self.measurements = measurements
         self.combinations_dict, self.x, self.longest_list = self.get_combinations()
+        if str('X') in self.x:
+            self.x.remove('X')
+            print("Removed X from x")
         if plot:
             self.plotting()
 
@@ -89,10 +92,8 @@ class TestSeries:
         #ax1
         ax1.set_title('Cl' + '-' + self.longest_list)
         for i in range(len(list(self.combinations_dict.keys())[0])):
-            debug_V_pp = list(self.combinations_dict.values())[0][i]
-            debug_f_burst = list(self.combinations_dict.values())[1][i]
-            debug_duty_cycle = list(self.combinations_dict.values())[2][i]
-            y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cl']
+            y = self.measurements[(self.measurements[list(self.combinations_dict.keys())[0]] == list(self.combinations_dict.values())[0][i]) & (self.measurements[list(self.combinations_dict.keys())[1]] == list(self.combinations_dict.values())[1][i]) & (self.measurements[list(self.combinations_dict.keys())[2]] == list(self.combinations_dict.values())[2][i])]['Cd']
+            print(len(self.x), len(y))
             if len(self.x) == len(y):
                 ax1.plot(self.x, y, label=list(self.combinations_dict.keys())[0] + ' = ' + str(list(self.combinations_dict.values())[0][i]) + ', ' + list(self.combinations_dict.keys())[1] + ' = ' + str(list(self.combinations_dict.values())[1][i]) + ', ' + list(self.combinations_dict.keys())[2] + ' = ' + str(list(self.combinations_dict.values())[2][i]))
             else:

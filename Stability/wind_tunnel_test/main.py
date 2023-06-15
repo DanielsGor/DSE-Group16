@@ -25,7 +25,7 @@ def main():
     data = get_coeff(data, S, c, rho, v)
     #split data into test cases
     df_1, df_3, df_4 = split_data(data)
-    test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)
+    #test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)
     test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=True)
     test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=True)
 

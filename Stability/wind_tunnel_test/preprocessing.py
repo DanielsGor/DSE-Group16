@@ -37,7 +37,6 @@ def get_data_matlab():
     return df_test_data
     
 
-
 def get_test_matrix():
     path = 'Stability\\wind_tunnel_test\\wind_tunnel_test_matrix.xlsx'
     test_matrix = pd.read_excel('Stability\\wind_tunnel_test\\wind_tunnel_test_matrix.xlsx')
@@ -57,7 +56,6 @@ def calc_aero_forces(df_test_data=get_data_matlab(), test_matrix=get_test_matrix
     data = pd.concat([test_matrix, aero_forces], axis=1)
     
     return data
-
 
 if __name__ == '__main__':
     df_test_data = get_data_matlab()

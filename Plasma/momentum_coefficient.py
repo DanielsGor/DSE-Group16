@@ -63,11 +63,15 @@ for file in files_csv:
 
 
 # plt.plot(V_pp,J_exp)
-print(np.polyfit(V_pp,J_exp,2))
-plt.plot(u_array,J_sim)
 print(np.polyfit(u_array,J_sim,2))
-
-p = np.poly1d([2.45983381e-03, 9.85037659e-01, 1.53444040e+01])
+p = np.polyfit(V_pp,J_exp,2)
+plt.plot(V_pp,J_exp)
+plt.plot(V_pp,np.poly1d(p)(V_pp))
+print(V_pp)
+print(J_exp)
+print(u_array)
+print(J_sim)
+# p = np.poly1d([2.45983381e-03, 9.85037659e-01, 1.53444040e+01])
 # plt.plot(V_pp,p(V_pp))
 # plt.legend()
 # plt.grid()

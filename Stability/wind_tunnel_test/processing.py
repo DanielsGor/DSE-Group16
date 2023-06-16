@@ -136,6 +136,10 @@ class TestSeries:
         ax3.set_xlabel(self.longest_list, fontsize='14')
         ax3.set_ylabel('Cm', fontsize='14')
 
+        # Create legend for all subplots
+        handles, labels = ax1.get_legend_handles_labels()
+        legend_fig = plt.figure()
+        plt.legend(handles, labels, loc='upper left', fontsize='12')
         plt.show()
 
         return
@@ -147,9 +151,9 @@ class TestSeries:
             cm = self.measurements[(self.measurements[self.keys[0]] == self.combinations_list[i][0]) & (self.measurements[self.keys[1]] == self.combinations_list[i][1]) & (self.measurements[self.keys[2]] == self.combinations_list[i][2])]['Cm']
             if len(self.x) == len(cl) == len(cd) == len(cm):
                 #take derivative of each measurement to the next
-                cl_int = sc.interpolate.CubicSpline(self.x, cl, bc_type='natural')
-                cd_int = sc.interpolate.CubicSpline(self.x, cd, bc_type='natural')
-                cm_int = sc.interpolate.CubicSpline(self.x, cm, bc_type='natural')
+                cl_int = sc.interpolate.CubicSpline(self.x, cl, bc_type='natural', nan_policy='ignore')
+                cd_int = sc.interpolate.CubicSpline(self.x, cd, bc_type='natural', nan_policy='ignore')
+                cm_int = sc.interpolate.CubicSpline(self.x, cm, bc_type='natural', nan_policy='ignore')
                 cl_deriv = cl_int(self.measurements.index, nu=1)
                 cd_deriv = cd_int(self.measurements.index, nu=1)
                 cm_deriv = cm_int(self.measurements.index, nu=1)

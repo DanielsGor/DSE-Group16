@@ -3,6 +3,7 @@ import glob
 import pandas as pd
 from constants import df
 import matplotlib.pyplot as plt
+from matplotlib import cycler
 
 class load_distribution:
     def __init__(self, df):
@@ -71,42 +72,70 @@ class load_distribution:
             self.intload[n, 1] = self.coefdist[n, 2]
             self.intload[n, 2] = -sum(self.loaddist[:n+1, 1])
             if n < self.coefdist.shape[0] - 1:
-                self.intload[n, 3] = - self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * (self.coefdist[n, 0] - self.coefdist[n + 1, 0]) + self.intload[n, 1] * 0.2 * self.c[n]
+                if n == 0:
+                    self.intload[n, 3] = - self.coefdist[
+                        n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * (
+                                                     self.coefdist[n, 0] - self.coefdist[n + 1, 0]) + self.intload[
+                                             n, 1] * 0.2 * self.c[n]
+                else:
+                    self.intload[n, 3] = self.intload[n-1, 3] - self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * (self.coefdist[n, 0] - self.coefdist[n + 1, 0]) + self.intload[n, 1] * 0.2 * self.c[n]
             elif n == self.coefdist.shape[0] - 1:
-                self.intload[n, 3] = - self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * self.coefdist[n, 0] * 2 + self.intload[n, 1] * 0.2 * self.c[n]
-            # print(self.intload[n, 1] * 0.2 * self.c[n])
-        # print(self.intload)
+                self.intload[n, 3] = self.intload[n-1, 3] - self.coefdist[n, 3] * 0.5 * self.rho * self.V_cruise ** 2 * self.MAC * self.c[n] * self.coefdist[n, 0] * 2 + self.intload[n, 1] * 0.2 * self.c[n]
+        # print(np.abs(np.max(self.intload[:,1])),np.max(np.abs(self.intload[:,2])),np.max(np.abs(self.intload[:,3])))
         return self.intload
 
-    def get_normalstress(self, B):
+    def get_normalstress(self, B1, B2):
         # Ixx for 4 booms of area B [mm^2] each
-        self.Ixx = 4 * B * (0.07 * self.c * 1000 / 2) ** 2
+        self.Ixx = 2 * B1 * (0.085 * self.c * 1000 / 2) ** 2 + 2 * B2 * (0.045 * self.c * 1000 / 2) ** 2
         # print(self.intload[:, 1], self.c ,self.Ixx)
-        self.sigma = 3.8 * self.intload[:, 1] * 1000 * (0.07 * self.c *1000 / 2) / self.Ixx
+        self.sigma = 3.8 * self.intload[:, 1] * 1000 * (0.085 * self.c *1000 / 2) / self.Ixx
+        print(self.sigma, self.sigma_y)
         return self.sigma, self.sigma_y
 
     def get_shear_stress(self):
-        B = 20
-        self.Ixx = 8 * B * (0.07 * self.c * 1000 / 2) ** 2
+        B1 = 15
+        B2 = 15
+        self.Ixx = 2 * B1 * (0.085 * self.c * 1000 / 2) ** 2 + 2 * B2 * (0.045 * self.c * 1000 / 2) ** 2
         self.intload[:, 2] = self.intload[:, 2]
         self.intload[:, 3] = self.intload[:, 3] * 1000
         self.c = self.c * 1000
-        # print(self.intload[-1, 2], self.c[-1], self.intload[-1, 3])
-        qtop = 3.8 * (self.intload[:, 3]/ (2 * 0.07 * self.c * 0.40 * self.c))
-        qleft = 3.8 * (-self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3]/ (2 * 0.07 * self.c * 0.40 * self.c))
-        qbot = 3.8 * (self.intload[:, 3] / (2 * 0.07 * self.c * 0.40 * self.c))
-        qright = 3.8 * (self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3] / (2 * 0.07 * self.c * 0.40 * self.c))
+        # print(self.intload[-1, 2], self.c[-1], self.intload[-1, 3]) (0.085*self.c + 0.045*self.c)/2*0.4*self.c
+        qtop = 3.8 * (self.intload[:, 3]/ (2 * (0.085*self.c + 0.045*self.c)/2*0.4*self.c))
+        qleft = 3.8 * (-self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3]/ (2* (0.085*self.c + 0.045*self.c)/2*0.4*self.c))
+        qbot = 3.8 * (self.intload[:, 3] / (2 * (0.085*self.c + 0.045*self.c)/2*0.4*self.c))
+        qright = 3.8 * (self.intload[:, 2] / (2 * 0.07 * self.c) + self.intload[:, 3] / (2 * (0.085*self.c + 0.045*self.c)/2*0.4*self.c))
         # print(qtop, qleft, qbot, qright)
-        print(np.max(np.abs(qtop/5)), np.max(np.abs(qleft/self.tau_str)), np.max(np.abs(qbot/5)), np.max(np.abs(qright/self.tau_str)))
-        print(qtop / 5, qleft / self.tau_str, qbot / 5, qright / self.tau_str)
+        print(np.max(np.abs(qtop/ self.tau_str)), np.max(np.abs(qleft/self.tau_str)), np.max(np.abs(qbot/self.tau_str)), np.max(np.abs(qright/self.tau_str)))
+        # print(qtop / 5, qleft / self.tau_str, qbot / 5, qright / self.tau_str)
         # print(q1 / self.tau_str, q2 / self.tau_str, q3 / self.tau_str)
-        # print(self.intload[:,0])
+        print(self.intload[:,0])
 
-# dist = load_distribution(df)
-# coefdist, c = dist.get_array()
-# loaddist = dist.get_loaddist()
-# intload = dist.get_intload()
-# sigma, sigma_y = dist.get_normalstress(20)
+    def plotter(self):
+        colors = cycler('color',
+                        ['#165baa', '#d382ec', '#34a1c7',
+                         '#f765a3', '#0b1354', '#ffa4b6',
+                         '#f2e2aa', '#f9d1d1'])
+        plt.rc('axes', facecolor='#E9E9E9', edgecolor='none',
+               axisbelow=True, grid=True, prop_cycle=colors)
+        plt.rc('grid', color='w', linestyle='solid')
+        plt.rc('xtick', direction='out', color='gray')
+        plt.rc('ytick', direction='out', color='gray')
+        plt.rc('patch', edgecolor='#E6E6E6')
+        plt.rc('lines', linewidth = 2)
+        plt.plot(self.intload[:,0], self.intload[:,3], mfc='black', mew=0, label="Torsional moment distribution")
+        # plt.grid(which='both')
+        plt.legend(facecolor="white", fontsize='12')
+        plt.xlabel('Span [m]', fontsize='14')
+        plt.ylabel('Torsional Moment [Nm]', fontsize = '14')
+        plt.show()
+
+dist = load_distribution(df)
+coefdist, c = dist.get_array()
+loaddist = dist.get_loaddist()
+intload = dist.get_intload()
+sigma, sigma_y = dist.get_normalstress(15,15)
+dist.get_shear_stress()
+# dist.plotter()
 # dist.get_shear_stress()
 # print(sigma, sigma_y, '\n end')
 # # plot load distribution

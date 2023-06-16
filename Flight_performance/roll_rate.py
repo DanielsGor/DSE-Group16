@@ -92,7 +92,7 @@ plt.plot ([50-xs for xs in x],y, color = '#34A1C7', label = 'Flight path')
 
 
 plt.legend(facecolor="white", fontsize='12')
-plt.xlabel('x[m]', fontsize='14')
-plt.ylabel('y[m]', fontsize='14')
+plt.xlabel("$ \Delta y_{E} [m]$", fontsize='14')
+plt.ylabel("$ \Delta x_{E} [m]$", fontsize='14')
            
 plt.show()

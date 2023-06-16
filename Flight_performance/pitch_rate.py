@@ -71,14 +71,15 @@ while global_pitch_angle > np.deg2rad(-climb_angle):
 
 
 
-
-
 Ls = [cl_cruise * 1/2 * rho * Vcurrent ** 2 * S for Vcurrent in Vs]
 Ws = m * g / np.cos(global_pitch_angles)
 ns = Ls/Ws
 
 # plt.plot(times, ns)
 # plt.show()
+
+
+print ('max load factor:', max(ns), '\nmax pitch rate:', max(pitch_rates),'\nRoll pitch acceleration', max(pitch_dot2(dt,global_pitch_angles)),min(pitch_dot2(dt,global_pitch_angles)))
 
 
 plt.plot(times[:-3],pitch_dot2(dt,global_pitch_angles))
@@ -92,12 +93,26 @@ plt.show()
 # plt.plot (x, y)
 # plt.show()
 
+#results 
 
-print("Vmax is:", max(Vs), "m/s")
-print("The limiting pitch rate is: ", max(pitch_rates)*180/np.pi, " deg/s")
-print("The limiting load factor is: ", max(ns))
 
-print(a_tangential, a_centripetal)
+from matplotlib import cycler
+colors = cycler('color',
+                ['#165baa', '#d382ec', '#34a1c7',
+                 '#f765a3', '#0b1354', '#ffa4b6',
+                 '#f2e2aa', '#f9d1d1'])
+plt.rc('axes', facecolor='#E9E9E9', edgecolor='none',
+       axisbelow=True, grid=True, prop_cycle=colors)
+plt.rc('grid', color='w', linestyle='solid')
+plt.rc('xtick', direction='out', color='gray')
+plt.rc('ytick', direction='out', color='gray')
+plt.rc('patch', edgecolor='#E6E6E6')
+plt.rc('lines', linewidth=2)
+           
+plt.plot (x,y, color = '#34A1C7', label = 'Flight path')
 
-print((pitch_rates[1]-pitch_rates[0])/dt)
-print(min(pitch_dot2(dt,global_pitch_angles)))
+plt.legend(facecolor="white", fontsize='12')
+plt.xlabel("$ \Delta x_{E}[m]$", fontsize='14')
+plt.ylabel("$ \Delta z_{E}[m]$", fontsize='14')
+           
+plt.show()

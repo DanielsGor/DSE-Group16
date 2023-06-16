@@ -6,7 +6,6 @@
 function HighLiftTest_PostProcessFile()
     
     current_dir = pwd;
-    disp(current_dir)
     % Call the HighLiftTest_PostProcessFile function with the directory path as an argument
     directory = fullfile(current_dir, 'data');
     run_post_processing(directory);
@@ -23,10 +22,9 @@ function run_post_processing(directory)
     results{1, 3} = 'Mean Ax';
 
     % Process each file
-    for i = 1:numel(files)
+    for i = 1:2
         file = fullfile(directory, files(i).name);
-        %file = "C:\Users\louis\PycharmProjects\SVV\B50\DSE-Group16\Stability\wind_tunnel_test\data\data\id_0_ts_1_aoa_-8_Vpp_0_fburst_X_dutycycle_X.tdms";
-
+        %file = 'C:\Users\louis\PycharmProjects\SVV\B50\DSE-Group16\Stability\wind_tunnel_test\data\data\id_179_ts_3_aoa_8_Vpp_12_fburst_50_dutycycle_0.1.tdms';
         [~, file_name, ~] = fileparts(file);
         
         % Call the matlab_conversion function

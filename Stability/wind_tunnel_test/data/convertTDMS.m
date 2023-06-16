@@ -291,7 +291,7 @@ for fnum=1:numel(infilename)
     [SegInfo,NumOfSeg]=getSegInfo(fid);
     
     % Build a database with channel info
-    [channelinfo SegInfo]=getChannelInfo(fid,SegInfo,NumOfSeg);
+    [channelinfo, SegInfo]=getChannelInfo(fid,SegInfo,NumOfSeg);
     
     % Add channel count to SegInfo
     %SegInfo=addChanCount(SegInfo,channelinfo);
@@ -533,7 +533,7 @@ end
 NumOfSeg=segCnt;
 end
 %%
-function [index SegInfo]=getChannelInfo(fid,SegInfo,NumOfSeg)
+function [index, SegInfo]=getChannelInfo(fid,SegInfo,NumOfSeg)
 %Loop through the segements and get all of the object information.
 % name:  Short name such as Object3
 % long_name: The path directory form of the object name
@@ -561,7 +561,11 @@ function [index SegInfo]=getChannelInfo(fid,SegInfo,NumOfSeg)
 %Initialize variables for the file conversion
 index=struct();
 objOrderList={};
+
+NumOfSeg=600;
+
 for segCnt=1:NumOfSeg
+    
     
     %Go to the segment starting position of the segment
     fseek(fid,SegInfo.SegStartPosn(segCnt)+28,'bof');
@@ -708,9 +712,14 @@ for segCnt=1:NumOfSeg
                         if kTocRawData
                             if (kTocNewObjectList)
                                 ccnt=index.(obname).rawdatacount+1;
+                                disp(index.(obname).rawdatacount)
+                                disp('if');
                             else
                                 ccnt=index.(obname).rawdatacount;
+                                disp('else');
                             end
+                            disp('Index number: ')
+                            disp(obname)
                             index.(obname).rawdatacount=ccnt;
                             index.(obname).datastartindex(ccnt)=SegInfo.DataStartPosn(segCnt);
                             index.(obname).arrayDim(ccnt)=index.(obname).arrayDim(ccnt-1);

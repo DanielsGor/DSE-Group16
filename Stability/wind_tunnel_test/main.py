@@ -15,8 +15,8 @@ v = 15 # m/s
 
 def main():
     #preprocessing
-    #data = calc_aero_forces(x_ac_to_fb=x_ac_to_fb, y_ac_fb=y_ac_fb)
-    data = pd.read_excel('Stability\\wind_tunnel_test\\data.xlsx') #remember to remove and use above line
+    data = calc_aero_forces(x_ac_to_fb=x_ac_to_fb, y_ac_fb=y_ac_fb)
+    #data = pd.read_excel('Stability\\wind_tunnel_test\\data.xlsx') #remember to remove and use above line
     #processing
     data = get_coeff(data, S, c, rho, v)
     #split data into test cases

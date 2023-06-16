@@ -26,7 +26,7 @@ def scale_coordinates(filename, chord):
 
 # Example usage
 filename = 'NACA642-015A.txt'
-chord = 252   #in mm
+chord = 1000   #in mm
 
 scaled_coords = scale_coordinates(filename, chord)
 print(scaled_coords)

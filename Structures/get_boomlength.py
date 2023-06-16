@@ -94,7 +94,7 @@ def finalmass(length, xdif, tskin, rho_tail,thicknessV, thicknessH, rho_boom, wi
     return(M, maximum_stress, deflection, Mboom_tot, Mempennage)
 
 
-lengthrange = np.arange(0.2, 2, .1)
+lengthrange = [1.03]
 tskinrange = np.arange(.0005, .001, .0001)
 thicknessVrange = np.arange(.0005, .001, .0001)
 thicknessHrange = np.arange(.0005, .001, .0001)

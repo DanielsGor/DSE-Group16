@@ -242,6 +242,30 @@ def calculate_lift_distribution_rect (alpha_root_local, c_r_local, b_s_local):
     return lifts, ideals, cs, angles, cls, ys, twist_rate
 
 
+def calculate_lift_distribution_conceptual ():
+    
+    b_w =1.45
+    S = 1.015
+    A = 9.6
+    c_l_alpha = (0.9 + 0.85 )/(5.5 + 8)
+    V_local = 12
+    taper = 0.45
+    c_t = 0.22
+
+    c_r_local = c_t/taper
+
+    cl_yi = m*g / (0.5 * rho * V_local**2 * S )
+    lifts = []
+    ys = []
+    for yi in np.linspace (0,b_w, 1000):
+        c_yi =  (c_t -c_r_local)*(yi/b_w) + c_r_local
+        correctional_factor_for_lift = -6.566*(yi)**6 + 27.609*(yi)**5 -44.472*(yi)**4 + 34.027*(yi)**3 - 12.528*(yi)**2 + 1.9309*(yi) -0.0835  #numbers from xflr5 comparing 2d to 3d case of straight wing
+        local_param = cl_yi* 1/2 *rho * V_local**2 * c_yi * (1+correctional_factor_for_lift)
+        lifts.append(local_param)
+        ys.append(yi)
+    return lifts, ys
+
+
 c_r_twist, alpha_root_twist = 0.40000000000000013, -0.5
 l_twist, i_twist, c_twist, a_twist, cl_twist, y_twist, twist_rate_twist = calculate_lift_distribution_twist(alpha_root_local=alpha_root_twist,c_r_local=c_r_twist) 
 
@@ -251,12 +275,29 @@ l_twist2, i_twist2, c_twist2, a_twist2, cl_twist2, y_twist2, twist_rate_twist2 =
 c_r_rect, alpha_root_rect, b_s_rect = 0.2, 6, 0.9
 l_rect, i_rect, c_rect, a_rect, cl_rect, y_rect, twist_rate_rect = calculate_lift_distribution_rect(alpha_root_local=alpha_root_rect,c_r_local=c_r_rect,b_s_local=b_s_rect)
 
+l_concept, y_concept =calculate_lift_distribution_conceptual()
 
+# plt.plot (y_twist, l_twist, label = 'twist')
+# plt.plot(y_twist2,l_twist2, label = 'twist2')
 
+from matplotlib import cycler
+colors = cycler('color',
+                ['#165baa', '#d382ec', '#34a1c7',
+                 '#f765a3', '#0b1354', '#ffa4b6',
+                 '#f2e2aa', '#f9d1d1'])
+plt.rc('axes', facecolor='#E9E9E9', edgecolor='none',
+       axisbelow=True, grid=True, prop_cycle=colors)
+plt.rc('grid', color='w', linestyle='solid')
+plt.rc('xtick', direction='out', color='gray')
+plt.rc('ytick', direction='out', color='gray')
+plt.rc('patch', edgecolor='#E6E6E6')
+plt.rc('lines', linewidth=2)
 
-plt.plot (y_twist, l_twist, label = 'twist')
-plt.plot(y_twist2,l_twist2, label = 'twist2')
-plt.plot (y_rect,l_rect, label = 'rect')
-plt.plot (y_rect,i_rect, label = 'ideal')
-plt.legend()
+plt.plot ([y/1.45 for y in y_rect],[l/1 for l in i_rect], label = 'Ideal elliptical lift distribution')           
+plt.plot ([y/1.45 for y in y_rect],[l/1 for l in l_rect], label = 'Preliminary Design lift distribution')
+plt.plot ([y/1.45 for y in y_concept],[l for l in l_concept], label = 'Conceptual Design lift distribution')
+
+plt.legend(facecolor="white", fontsize='12')
+plt.xlabel('Distance along semi-span [m]', fontsize='14')
+plt.ylabel('Local lift [N]', fontsize='14')
 plt.show()

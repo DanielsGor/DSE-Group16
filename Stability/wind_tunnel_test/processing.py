@@ -102,6 +102,10 @@ class TestSeries:
         for i in range(len(self.combinations_list)):
             y = self.measurements[(self.measurements[self.keys[0]] == self.combinations_list[i][0]) & (self.measurements[self.keys[1]] == self.combinations_list[i][1]) & (self.measurements[self.keys[2]] == self.combinations_list[i][2])]['Cl']
             label=self.keys[0] + ' = ' + str(self.combinations_list[i][0]) + ', ' + self.keys[1] + ' = ' + str(self.combinations_list[i][1]) + ', ' + self.keys[2] + ' = ' + str(self.combinations_list[i][2])
+            if self.name=='Test Series 1' and i==0:
+                df_cl_alpha = pd.DataFrame({'x': self.x, 'y': y}) 
+                df_cl_alpha.to_excel('cl_alpha.xlsx')
+            
             if len(self.x) == len(y):
                 ax1.plot(self.x, y, label=label)
             else:
@@ -110,6 +114,8 @@ class TestSeries:
         #ax1.grid(which='both')
         ax1.set_xlabel(self.longest_list, fontsize='14')
         ax1.set_ylabel('Cl', fontsize='14')
+
+
 
         #ax2
         ax2.set_title('Cd' + '-' + self.longest_list)

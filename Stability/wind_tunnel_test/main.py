@@ -8,8 +8,8 @@ from processing import get_coeff, split_data, TestSeries
 x_ac_to_fb = 0.050 # m distance from aerodynamic center to force balance center
 y_ac_fb = 0.085 - 0.038 # m distance from aerodynamic center to force balance center
 
-S = 0.1 # m^2
-c = 0.2 # m
+S = 0.08208 # m^2
+c = 0.152 # m
 rho = 1.225 # kg/m^3
 v = 15 # m/s
 
@@ -24,6 +24,7 @@ def main():
     test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)
     test_series3 = TestSeries(name='Test Series 3', measurements=df_3, plot=True)
     test_series4 = TestSeries(name='Test Series 4', measurements=df_4, plot=True)
+    test_series5 = TestSeries(name='Test Series 5', measurements=df_1, plot=True)
 
     print('Variable test series 1: ', test_series1.x)
     print('Variable test series 3: ', test_series3.x)

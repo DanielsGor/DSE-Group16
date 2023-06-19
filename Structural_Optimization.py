@@ -44,6 +44,7 @@ class fuselage:
         self.boom_area = None
         self.result = None
         self.type = None
+        self.Kt = None
 
     def fuselage_internal_loads(self):
         #   Simplify arrays to make sure that they match the output arrays size
@@ -207,8 +208,9 @@ class fuselage:
         tensile_strength = self.stringer_mat_tens
         compressive_strength = self.stringer_mat_comp
 
-        normal_stress_1 = (bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
-        normal_stress_2 = (- bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
+        # Apply Kt factor to normal stress
+        normal_stress_1 = self.Kt * (bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
+        normal_stress_2 = self.Kt * (- bending / (2 * self.boom_area * fuselage_height) + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
         compressive_stress = min(normal_stress_1, normal_stress_2)
         tensile_stress = max(normal_stress_1, normal_stress_2)
 
@@ -272,9 +274,9 @@ class fuselage:
         Ixx_vskin = 0
         Ixx = 4 * Ixx_boom + 2 * Ixx_hskin + 2 * Ixx_vskin
 
-        #   Note: correct bending equation
-        normal_stress_1 = (bending * (fuselage_height / 2) / Ixx + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
-        normal_stress_2 = (- bending * (fuselage_height / 2) / Ixx + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
+        #   Apply Kt factor to normal stress
+        normal_stress_1 = self.Kt * (bending * (fuselage_height / 2) / Ixx + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
+        normal_stress_2 = self.Kt * (- bending * (fuselage_height / 2) / Ixx + normal / (4 * self.boom_area)) / 10 ** 6  # In MPa
         shear_stress_v = shear / (2 * skin_vthickness) / 10 ** 6  # In MPa
         compressive_stress = min(normal_stress_1, normal_stress_2)
         tensile_stress = max(normal_stress_1, normal_stress_2)
@@ -332,8 +334,7 @@ class fuselage:
         return self.stringer_height, self.stringer_width, self.stringer_thickness
 
 fus = fuselage(df)
-fus.shear_distribution, fus.moment_distribution, fus.normal_load_distribution, \
-    fus.wingbox_normal_distribution  = fus.fuselage_internal_loads()
+
 fus.skin_mat_comp = 80 * 10**6
 fus.skin_mat_tens = 80 * 10**6
 fus.skin_mat_shear = 60 * 10**6
@@ -343,6 +344,8 @@ fus.stringer_mat_comp = 345 * 10**6
 fus.stringer_mat_tens = 345 * 10**6
 fus.stringer_mat_shear = 207 * 10**6
 fus.stringer_mat_density = 2800
+
+fus.Kt = 2
 
 dimensions = {'launch': {'vertical skin thickness': None, 'horizontal skin thickness': None, 'skin mass': None,
                         'stringer height': None, 'stringer width': None, 'stringer thickness': None,
@@ -361,6 +364,8 @@ dimensions = {'launch': {'vertical skin thickness': None, 'horizontal skin thick
 
 for i in ['launch', 'landing', 'deployment', 'max']:
     fus.type = i
+    fus.shear_distribution, fus.moment_distribution, fus.normal_load_distribution, \
+        fus.wingbox_normal_distribution = fus.fuselage_internal_loads()
     for b in np.arange(0.00001, 0.0001, 0.00001):
         fus.boom_area = b
         if fus.primary_stress_check() is True:
@@ -383,6 +388,7 @@ for i in ['launch', 'landing', 'deployment', 'max']:
                             dimensions[i]['stringer width'] = w
                             dimensions[i]['stringer thickness'] = t
                             dimensions[i]['total mass'] = m
+    print('step done')
 
 
 print(dimensions['launch']['total mass'], dimensions['landing']['total mass'], dimensions['deployment']['total mass'],

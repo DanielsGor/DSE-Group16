@@ -65,8 +65,8 @@ files_csv = ['plasma-x15-y10-v1.csv','plasma-x15-y10-v2.csv','plasma-x15-y10-v3.
 
 
 # u_mw,y_mw = get_data_from_csv(files_csv[4])
-u_plasma,y_plasma = get_data_from_csv('u-y_norm.csv')
-u_plasma,y_plasma = normalise(u_plasma,y_plasma)
+u_plasma,y_plasma = get_data_from_csv('u_y_experiment.csv')
+# u_plasma,y_plasma = normalise(u_plasma,y_plasma)
 # u_norm, y_norm = normalise(u_mw,y_mw)    
 
 # mt_plasma = momentum_thickness(u_plasma,y_plasma)
@@ -83,13 +83,13 @@ u_plasma,y_plasma = normalise(u_plasma,y_plasma)
 
 for file in files_csv:
     u, y = get_data_from_csv(file)
-    u, y = normalise(u,y)
+    # u, y = normalise(u,y)
     plt.plot(u,y,label="$Simulation, V_{moving wall} = $"+file[-5]+"[m/s]")
 
 # plt.style.use('ggplot')
-plt.plot(u_plasma,y_plasma,'X',mfc='black',mew=0,label="Experimental data")
+plt.plot(u_plasma,y_plasma/1000,'X',mfc='black',mew=0,label="Experimental data")
 # plt.grid(which='both')
 plt.legend(facecolor="white", fontsize='12')
-plt.xlabel('u*', fontsize='14')
-plt.ylabel('y*', fontsize='14')
+plt.xlabel('u', fontsize='14')
+plt.ylabel('y', fontsize='14')
 plt.show()

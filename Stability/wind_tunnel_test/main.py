@@ -19,7 +19,7 @@ def main():
     #data = pd.read_excel('Stability\\wind_tunnel_test\\data.xlsx') #remember to remove and use above line
     #processing
     data = get_coeff(data, S, c, rho, v)
-    data['alpha'] = data['alpha'] * 0.3 #scale alpha to match analytical data
+    data['alpha'] = data['alpha'] * 0.325 #scale alpha to match analytical data
     #split data into test cases
     df_1, df_3, df_4 = split_data(data)
     test_series1 = TestSeries(name='Test Series 1', measurements=df_1, plot=True)

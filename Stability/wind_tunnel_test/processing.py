@@ -98,12 +98,16 @@ class TestSeries:
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         fig.suptitle('Aerodynamic coefficients vs ' + self.longest_list)
         #ax1
+        
+        df_cl_alpha = pd.DataFrame(columns=['alpha'])
+
         ax1.set_title('Cl' + '-' + self.longest_list)
         for i in range(len(self.combinations_list)):
             y = self.measurements[(self.measurements[self.keys[0]] == self.combinations_list[i][0]) & (self.measurements[self.keys[1]] == self.combinations_list[i][1]) & (self.measurements[self.keys[2]] == self.combinations_list[i][2])]['Cl']
             label=self.keys[0] + ' = ' + str(self.combinations_list[i][0]) + ', ' + self.keys[1] + ' = ' + str(self.combinations_list[i][1]) + ', ' + self.keys[2] + ' = ' + str(self.combinations_list[i][2])
             if len(self.x) == len(y):
                 ax1.plot(self.x, y, label=label)
+                df_cl_alpha[label] = y
             else:
                 print('Skipped Cl vs ' + self.longest_list + ' for ' +  self.keys[0] + ' = ' + str(self.combinations_list[i][0]) + ', ' + self.keys[1] + ' = ' + str(self.combinations_list[i][1]) + ', ' + self.keys[2] + ' = ' + str(self.combinations_list[i][2]))
         #ax1.legend(facecolor="white", fontsize='12')

@@ -102,10 +102,6 @@ class TestSeries:
         for i in range(len(self.combinations_list)):
             y = self.measurements[(self.measurements[self.keys[0]] == self.combinations_list[i][0]) & (self.measurements[self.keys[1]] == self.combinations_list[i][1]) & (self.measurements[self.keys[2]] == self.combinations_list[i][2])]['Cl']
             label=self.keys[0] + ' = ' + str(self.combinations_list[i][0]) + ', ' + self.keys[1] + ' = ' + str(self.combinations_list[i][1]) + ', ' + self.keys[2] + ' = ' + str(self.combinations_list[i][2])
-            if self.name=='Test Series 1' and i==0:
-                df_cl_alpha = pd.DataFrame({'x': self.x, 'y': y}) 
-                df_cl_alpha.to_excel('cl_alpha.xlsx')
-            
             if len(self.x) == len(y):
                 ax1.plot(self.x, y, label=label)
             else:
@@ -157,7 +153,7 @@ class TestSeries:
             ax1.set_title('Cl' + '-' + self.longest_list)
 
             first_curve = None  # Variable to store the first curve
-
+            df_delta_cl = pd.DataFrame(columns=['alpha'])
             for i in range(len(self.combinations_list)):
                 y = self.measurements[(self.measurements[self.keys[0]] == self.combinations_list[i][0]) & (self.measurements[self.keys[1]] == self.combinations_list[i][1]) & (self.measurements[self.keys[2]] == self.combinations_list[i][2])]['Cl']
                 label = self.keys[0] + ' = ' + str(self.combinations_list[i][0]) + ', ' + self.keys[1] + ' = ' + str(self.combinations_list[i][1]) + ', ' + self.keys[2] + ' = ' + str(self.combinations_list[i][2])
@@ -166,12 +162,17 @@ class TestSeries:
                     if first_curve is None:
                         first_curve = y  # Store the first curve
                     delta_cl = y.to_numpy() - first_curve.to_numpy()  # Subtract the first curve from the current curve
+                    delta_cl = delta_cl * np.sign(self.x)
+                    df_delta_cl['alpha'] = self.x
+                    df_delta_cl[label] = delta_cl
+                    print('DF DELTA CL', df_delta_cl)
                     ax1.plot(self.x, delta_cl, label=label)  # Plot delta C_L
                 else:
                     print('Skipped Cl vs ' + self.longest_list + ' for ' + self.keys[0] + ' = ' + str(self.combinations_list[i][0]) + ', ' + self.keys[1] + ' = ' + str(self.combinations_list[i][1]) + ', ' + self.keys[2] + ' = ' + str(self.combinations_list[i][2]))
 
             # ax1.legend(facecolor="white", fontsize='12')
             # ax1.grid(which='both')
+            df_delta_cl.to_csv('Stability\\wind_tunnel_test\\delta_cl.csv')
             ax1.set_xlabel(self.longest_list, fontsize='14')
             ax1.set_ylabel('Delta Cl', fontsize='14')
 
@@ -181,7 +182,7 @@ class TestSeries:
             plt.legend(handles, labels, loc='upper left', fontsize='12')
             plt.show()
 
-        return
+        return 
 
     def get_derivatives(self):
         for i in range(len(self.combinations_list)):

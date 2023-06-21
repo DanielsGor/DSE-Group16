@@ -38,7 +38,7 @@ with open('Plasma/momentum-voltage.csv', newline='') as csvfile:
     for row in reader:
         V_pp = np.append(V_pp,float(row['V_pp']))
         C_mu_exp = np.append(C_mu_exp,float(row['c_mu'])/100)
-J_exp = C_mu_exp*15**2*1.225*0.225/2
+J_exp = C_mu_exp*15*15*2*1.225*0.225/2
 
 
 files_csv = ['plasma-x15-y10-v1.csv',
@@ -52,25 +52,33 @@ files_csv = ['plasma-x15-y10-v1.csv',
              'plasma-x15-y10-v9.csv',
              'plasma-x15-y10-v10.csv']
 
+u_plasma,y_plasma = get_data_from_csv('u_y_experiment.csv')
+
 u_array = np.asarray(range(len(files_csv)+1))
 J_sim = np.asarray([0])
 for file in files_csv:
     u, y = get_data_from_csv(file)
     # C_mu = np.append(C_mu,J(u,y)/(15.1**2*0.5*1.225*0.1692))
-    J_sim = np.append(J_sim,J(u,y)*1.345767719100536)
+    J_sim = np.append(J_sim,J(u,y))#*1.345767719100536)
 
 # plt.style.use('ggplot')
 
-
+print("J for plasma = ",J(u_plasma,y_plasma/1000))
 # plt.plot(V_pp,J_exp)
-print(np.polyfit(V_pp,J_exp,2))
-plt.plot(u_array,J_sim)
-print(np.polyfit(u_array,J_sim,2))
-
-p = np.poly1d([2.45983381e-03, 9.85037659e-01, 1.53444040e+01])
+q = np.polyfit(J_sim,u_array,2)
+p = np.polyfit(V_pp,J_exp,2)
+# plt.plot(V_pp,J_exp)
+plt.plot(u_array,J_sim*100)
+# plt.plot(V_pp,C_mu_exp*100)
+# print(V_pp)
+# print(J_exp)
+# print(u_array)
+# print(J_sim)
+print(np.poly1d(p)(12))
+# p = np.poly1d([2.45983381e-03, 9.85037659e-01, 1.53444040e+01])
 # plt.plot(V_pp,p(V_pp))
 # plt.legend()
 # plt.grid()
 plt.xlabel('Moving wall velocity [m/s]', fontsize='14')
-plt.ylabel('$J$ [kg m/s]', fontsize='14')
+plt.ylabel('$J$ [kg/s$^2$]', fontsize='14')
 plt.show()

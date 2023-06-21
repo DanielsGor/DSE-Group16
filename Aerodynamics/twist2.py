@@ -99,8 +99,8 @@ d_alpha_root = 1
 d_cr = 0.2
 d_twist_rate = 0.2
 
-root_angles = np.arange(-6,-4+d_alpha_root,d_alpha_root)
-root_chords = np.arange(0.8,1.1 + d_cr,d_cr)
+root_angles = np.arange(-4,-4+d_alpha_root,d_alpha_root)
+root_chords = np.arange(1,1.2 + d_cr,d_cr)
 twist_rates = np.arange(-5,2 + d_twist_rate,d_twist_rate)
 
 

@@ -1,0 +1,130 @@
+%% Longitudinal
+
+%%% Aircraft parameters %%%
+mac = 0.3793; %[m]
+V_0 = 15; %[m/s]
+weight = 5; %[kg] preliminary
+K_xx = 0.35; %placeholder
+K_yy = 0.35; %placeholder
+K_zz = 0.35; %placeholder
+K_xz = 0.35; %placeholder
+
+%%% Stability derivatives %%%
+muc = weight / mac;
+D_c = 0.35; %placeholder
+%row 1
+C_X_u = 0.0001846; %placeholder
+C_X_a = -0.7877451; %placeholder
+C_Z_0 = 1.0309919; %placeholder
+C_X_q = 3.0980575; %placeholder
+
+%row 2
+C_Z_u = 0.0028627; %placeholder
+C_Z_a = 6.9269736; %placeholder
+C_Z_a_dot = 0.35; %placeholder
+C_X_0 = 0.0539141; %placeholder
+C_Z_q = 7.7926754; %placeholder
+%row 3 - no new parameters
+%row 4
+C_m_u = 0.0074638; %placeholder
+C_m_a = 4.2850081; %placeholder
+C_m_a_dot = 0.35; %placeholder
+C_m_q = -104.6554409; %placeholder
+
+%%% Control derivatives %%%
+C_X_f_upper = 0.35; %placeholder
+C_X_f_lower = 0.35; %placeholder
+C_X_dc_upper = 0.35; %placeholder
+C_X_dc_lower = 0.35; %placeholder
+C_X_dt = 0.35; %placeholder
+C_Z_f_upper = 0.35; %placeholder
+C_Z_f_lower = 0.35; %placeholder
+C_Z_dc_upper = 0.35; %placeholder
+C_Z_dc_lower = 0.35; %placeholder
+C_Z_dt = 0.35; %placeholder
+C_m_f_upper = 0.35; %placeholder
+C_m_f_lower = 0.35; %placeholder
+C_m_dc_upper = 0.35; %placeholder
+C_m_dc_lower = 0.35; %placeholder
+C_m_dt = 0.35; %placeholder
+
+
+%%% PQR form %%%
+P_long = [-2*muc*mac/V_0 0 0 0; 0 (C_Z_a_dot-2*muc)*mac/V_0 0 C_X_q; 0 0 -mac/V_0 0; 0 C_m_a_dot*mac/V_0 0 -2*muc*K_yy*mac/V_0];
+Q_long = [-C_X_u -C_X_a -C_Z_0 0; -C_Z_u -C_Z_a C_X_0 -(C_Z_q+2*muc); 0 0 0 -1; -C_m_u -C_m_a 0 -C_m_q];
+R_long = [-C_X_f_upper -C_X_f_lower -C_X_dc_upper -C_X_dc_lower -C_X_dt; -C_Z_f_upper -C_Z_f_lower -C_Z_dc_upper -C_Z_dc_lower -C_Z_dt; 0 0 0 0 0; -C_m_f_upper -C_m_f_lower -C_m_dc_upper -C_m_dc_lower -C_m_dt];
+
+%%% State Space Matrices %%%
+A_long = inv(P_long) * Q_long;
+B_long = inv(P_long) * R_long;
+
+C_long = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1; 0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 0];
+D_long = [0 0 0 0 0; 0 0 0 0 0; 0 0 0 0 0; 0 0 0 0 0; 1 0 0 0 0; 0 1 0 0 0; 0 0 1 0 0; 0 0 0 1 0; 0 0 0 0 1];
+
+%% Lateral
+
+%%% Input parameters %%%
+
+mu_b = 0.3;
+D_b = 0.3;
+
+% Stability parameters
+C_Y_beta = -0.1603275;
+C_Y_beta_dot = 0.3; %placeholder
+C_L = 1.0309919;
+C_Y_p = -0.0206750;
+C_Y_r = 0.3;
+C_l_beta = 0.3;
+C_l_p = 0.3;
+KXX = 0.3;
+C_l_r = 0.3;
+KXZ = 0.3;
+C_n_beta = 0.3;
+C_n_beta_dot = 0.3;
+C_n_p = 0.3;
+C_n_r = 0.3;
+KZZ = 0.3;
+
+% Control parameters
+C_Y_f_a_r = 0.3;
+C_Y_f_a_l = 0.3;
+C_Y_f_r_r = 0.3;
+C_Y_f_r_l = 0.3;
+C_Y_dc_a_r = 0.3;
+C_Y_dc_a_l = 0.3;
+C_Y_dc_r_r = 0.3;
+C_Y_dc_r_l = 0.3;
+
+C_l_f_a_r = 0.3;
+C_l_f_a_l = 0.3;
+C_l_f_r_r = 0.3;
+C_l_f_r_l = 0.3;
+C_l_dc_a_r = 0.3;
+C_l_dc_a_l = 0.3;
+C_l_dc_r_r = 0.3;
+C_l_dc_r_l = 0.3;
+
+C_n_f_a_r = 0.3;
+C_n_f_a_l = 0.3;
+C_n_f_r_r = 0.3;
+C_n_f_r_l = 0.3;
+C_n_dc_a_r = 0.3;
+C_n_dc_a_l = 0.3;
+C_n_dc_r_r = 0.3;
+C_n_dc_r_l = 0.3;
+
+% Aircraft parameters
+b = 3;
+V = 15;
+
+%%% Lateral state space parameters %%%
+P_lat = [ (C_Y_beta_dot-2*mu_b)*b/V 0 0 0; 0 -1/2*b/V 0 0; 0 0 -4*mu_b*KXX*b/V 4*mu_b*KXZ*b/V; C_n_beta_dot 0 4*mu_b*KXZ*b/V -4*mu_b*KZZ*b/V];
+Q_lat = [-C_Y_beta -C_L -C_Y_p -(C_Y_r-4*mu_b); 0 0 -1 0; -C_l_beta 0 -C_l_p -C_l_r; -C_n_beta 0 -C_n_p -C_n_r];
+R_lat = [-C_Y_f_a_r -C_Y_f_a_l -C_Y_f_r_r -C_Y_f_r_l -C_Y_dc_a_r -C_Y_dc_a_l -C_Y_dc_r_r -C_Y_dc_r_l; 0 0 0 0 0 0 0 0; -C_l_f_a_r -C_l_f_a_l -C_l_f_r_r -C_l_f_r_l -C_l_dc_a_r -C_l_dc_a_l -C_l_dc_r_r -C_l_dc_r_l; -C_n_f_a_r -C_n_f_a_l -C_n_f_r_r -C_n_f_r_l -C_n_dc_a_r -C_n_dc_a_l -C_n_dc_r_r -C_n_dc_r_l];
+
+A_lat = Q_lat\P_lat;
+B_lat = R_lat\P_lat;
+
+% PLEASE REDO C AND D BECAUSE THEY'RE NOT RIGHT ATM
+C_lat = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1; 0 0 0 0];
+D_lat = [0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0];

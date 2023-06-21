@@ -25,10 +25,12 @@ class fuselage:
         self.stringer_mat_comp = None  # Compressive strength of stringer material in MPa
         self.stringer_mat_shear = None  # Shear strength of stringer material in MPa
         self.stringer_mat_density = None  # Density of stringer material in kg/m^3
+        self.stringer_mat_E_modulus = None  # Young's modulus of stringer material in MPa
         self.skin_mat_tens = None  # Tensile strength of skin material in MPa
         self.skin_mat_comp = None  # Compressive strength of skin material in MPa
         self.skin_mat_shear = None  # Shear strength of skin material in MPa
         self.skin_mat_density = None  # Density of skin material in kg/m^3
+        self.skin_mat_E_modulus = None  # Young's modulus of skin material in MPa
         self.max_load_factor = df['n_max']  # Maximum load factor
         self.fuselage_drag_coefficient = None
         self.fuselage_lift_coefficient = None
@@ -45,6 +47,8 @@ class fuselage:
         self.result = None
         self.type = None
         self.Kt = None
+        self.stringer_buckling_coefficient = None
+        self.poisson_ratio = 0.33
 
     def fuselage_internal_loads(self):
         #   Simplify arrays to make sure that they match the output arrays size
@@ -324,6 +328,36 @@ class fuselage:
 
         return result
 
+    def buckling_check(self):
+        ratio = self.length * (self.stringer_buckling_coefficient /self.stringer_mat_comp * np.pi ** 2 *
+                               self.stringer_mat_E_modulus / (12 * (1 - self.poisson_ratio ** 2)) *
+                               (self.stringer_thickness / self.stringer_width) ** 2) ** (1 - 0.6)
+
+        fuselage_height = self.height
+
+        bending = np.max(self.moment_distribution)
+        normal = np.max(self.normal_load_distribution)
+
+        # Apply Kt factor to normal stress
+        normal_stress_1 = self.Kt * (bending / (2 * self.boom_area * fuselage_height) + normal / (
+                    4 * self.boom_area)) / 10 ** 6  # In MPa
+        normal_stress_2 = self.Kt * (- bending / (2 * self.boom_area * fuselage_height) + normal / (
+                    4 * self.boom_area)) / 10 ** 6  # In MPa
+        compressive_stress = min(normal_stress_1, normal_stress_2)
+
+        self.result = False
+
+        if ratio <= 1:
+            if ratio * self.stringer_mat_tens > abs(compressive_stress):
+                self.result = True
+            else:
+                self.result = False
+
+        elif ratio > 1:
+            self.result = True
+
+        return self.result
+
     def stiffener_sizing(self):
         #   Use stiffeners at the corners of the fuselage, L-shaped, with equal width and height
         radius = np.sqrt(self.boom_area / np.pi)
@@ -344,6 +378,9 @@ fus.stringer_mat_comp = 345 * 10**6
 fus.stringer_mat_tens = 345 * 10**6
 fus.stringer_mat_shear = 207 * 10**6
 fus.stringer_mat_density = 2800
+fus.stringer_mat_E_modulus = 70 * 10**9
+
+fus.stringer_buckling_coefficient = 0.425
 
 fus.Kt = 2
 
@@ -375,19 +412,20 @@ for i in ['launch', 'landing', 'deployment', 'max']:
                     fus.skin_hthickness = d
                     fus.boom_area = fus.boom_reduction()
                     if fus.secondary_stress_check() is True and fus.boom_area > 0:
-                        h, w, t = fus.stiffener_sizing()
-                        mskin = 2 * fus.skin_mat_density * fus.length * (c * fus.height + d * fus.width)
-                        mbooms = 4 * fus.stringer_mat_density * fus.length * (h * t + w * t)
-                        m = mskin + mbooms
-                        if m < dimensions[i]['total mass']:
-                            dimensions[i]['vertical skin thickness'] = c
-                            dimensions[i]['horizontal skin thickness'] = d
-                            dimensions[i]['skin mass'] = mskin
-                            dimensions[i]['stringer mass'] = mbooms
-                            dimensions[i]['stringer height'] = h
-                            dimensions[i]['stringer width'] = w
-                            dimensions[i]['stringer thickness'] = t
-                            dimensions[i]['total mass'] = m
+                        if fus.buckling_check() is True:
+                            h, w, t = fus.stiffener_sizing()
+                            mskin = 2 * fus.skin_mat_density * fus.length * (c * fus.height + d * fus.width)
+                            mbooms = 4 * fus.stringer_mat_density * fus.length * (h * t + w * t)
+                            m = mskin + mbooms
+                            if m < dimensions[i]['total mass']:
+                                dimensions[i]['vertical skin thickness'] = c
+                                dimensions[i]['horizontal skin thickness'] = d
+                                dimensions[i]['skin mass'] = mskin
+                                dimensions[i]['stringer mass'] = mbooms
+                                dimensions[i]['stringer height'] = h
+                                dimensions[i]['stringer width'] = w
+                                dimensions[i]['stringer thickness'] = t
+                                dimensions[i]['total mass'] = m
     print('step done')
 
 

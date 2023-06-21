@@ -9,7 +9,7 @@ x_poly = np.linspace(0,1.5,1000)
 A,B,C,D,E,F,G = -6.4621, 27.265, -44.064, 33.828, -12.495, 1.9321, 0.9162
 
 
-y_poly = [- for x in x_poly]
+y_poly = [i for x in x_poly]
 
 from matplotlib import cycler
 colors = cycler('color',
